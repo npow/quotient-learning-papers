@@ -1,0 +1,23 @@
+{
+  "certified": true,
+  "stride": 3,
+  "k": 1,
+  "tau": 3,
+  "test": "G_RAW_FIXED_ALPHABET",
+  "alpha": 0.05,
+  "epsilon_min": 0.20289855072463764,
+  "beta": 0.05,
+  "seeds": [
+    1
+  ],
+  "level_correction": "BONFERRONI",
+  "command": "python experiments/separation/run_noisy_depth2.py --eta 0.3 --seeds 1",
+  "commit": "accd439c5dbd9f66c01f76530b1fb37d30409835",
+  "python": "3.13.14",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "episodic": false,
+  "actual_stride": 3
+}

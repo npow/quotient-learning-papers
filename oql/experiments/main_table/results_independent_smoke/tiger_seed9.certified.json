@@ -1,0 +1,29 @@
+{
+  "certified": true,
+  "stride": 0,
+  "k": 1,
+  "tau": 1,
+  "test": "TV_FIXED_ALPHABET",
+  "alpha": 0.05,
+  "epsilon_min": 0.45,
+  "beta": 0.05,
+  "seeds": [
+    9
+  ],
+  "level_correction": "BONFERRONI",
+  "command": "python experiments/main_table/run_certified.py --envs tiger --seeds 9 --out experiments/main_table/results_independent_smoke",
+  "commit": "e6a167b650e912f0f9916e0e5f889a6056faf096",
+  "python": "3.13.14",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "sampling_scheme": "INDEPENDENT_TRAJECTORY_BLOCK",
+  "selection_fraction": 0.5,
+  "context_end": 1,
+  "policy_id": "always_listen",
+  "n_trajectories": 20000,
+  "history_max_length": 1,
+  "min_history_occurrences": 10,
+  "max_steps_per_episode": 15
+}

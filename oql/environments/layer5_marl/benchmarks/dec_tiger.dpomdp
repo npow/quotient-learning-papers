@@ -1,0 +1,189 @@
+# Dec-Tiger benchmark (Nair et al. 2003).
+# Two agents; hidden state = which side the tiger is on (tiger-left, tiger-right).
+# Actions per agent: listen, open-left, open-right.
+# Observations per agent: tiger-left, tiger-right.
+# Joint listen: each agent pays -2 and gets a noisy observation (85% accurate).
+# Both open correctly (away from tiger): +20 each.
+# Both open incorrectly: -50 each.
+# Any mismatch (one listens while other opens): -101 each.
+# Source: canonical Dec-POMDP benchmark; reconstructed from Nair et al. 2003.
+
+agents: 2
+discount: 0.95
+values: reward
+
+states: tiger-left tiger-right
+
+start: uniform
+
+actions:
+listen open-left open-right
+listen open-left open-right
+
+observations:
+tiger-left tiger-right
+tiger-left tiger-right
+
+# ---- Transitions ----
+# When either agent opens a door (any open-* action in joint action),
+# the tiger resets uniformly. When both listen, state stays the same.
+
+# both listen -> state preserved
+T: listen listen : tiger-left : tiger-left : 1.0
+T: listen listen : tiger-left : tiger-right : 0.0
+T: listen listen : tiger-right : tiger-right : 1.0
+T: listen listen : tiger-right : tiger-left : 0.0
+
+# all other joint actions -> tiger resets uniformly
+T: listen open-left : tiger-left : tiger-left : 0.5
+T: listen open-left : tiger-left : tiger-right : 0.5
+T: listen open-left : tiger-right : tiger-left : 0.5
+T: listen open-left : tiger-right : tiger-right : 0.5
+
+T: listen open-right : tiger-left : tiger-left : 0.5
+T: listen open-right : tiger-left : tiger-right : 0.5
+T: listen open-right : tiger-right : tiger-left : 0.5
+T: listen open-right : tiger-right : tiger-right : 0.5
+
+T: open-left listen : tiger-left : tiger-left : 0.5
+T: open-left listen : tiger-left : tiger-right : 0.5
+T: open-left listen : tiger-right : tiger-left : 0.5
+T: open-left listen : tiger-right : tiger-right : 0.5
+
+T: open-left open-left : tiger-left : tiger-left : 0.5
+T: open-left open-left : tiger-left : tiger-right : 0.5
+T: open-left open-left : tiger-right : tiger-left : 0.5
+T: open-left open-left : tiger-right : tiger-right : 0.5
+
+T: open-left open-right : tiger-left : tiger-left : 0.5
+T: open-left open-right : tiger-left : tiger-right : 0.5
+T: open-left open-right : tiger-right : tiger-left : 0.5
+T: open-left open-right : tiger-right : tiger-right : 0.5
+
+T: open-right listen : tiger-left : tiger-left : 0.5
+T: open-right listen : tiger-left : tiger-right : 0.5
+T: open-right listen : tiger-right : tiger-left : 0.5
+T: open-right listen : tiger-right : tiger-right : 0.5
+
+T: open-right open-left : tiger-left : tiger-left : 0.5
+T: open-right open-left : tiger-left : tiger-right : 0.5
+T: open-right open-left : tiger-right : tiger-left : 0.5
+T: open-right open-left : tiger-right : tiger-right : 0.5
+
+T: open-right open-right : tiger-left : tiger-left : 0.5
+T: open-right open-right : tiger-left : tiger-right : 0.5
+T: open-right open-right : tiger-right : tiger-left : 0.5
+T: open-right open-right : tiger-right : tiger-right : 0.5
+
+# ---- Observations ----
+# Only meaningful for listen listen — both agents hear the tiger location
+# with 85% accuracy. For all other joint actions, observation is uniform.
+
+# listen listen: tiger-left state
+O: listen listen : tiger-left : tiger-left tiger-left : 0.7225
+O: listen listen : tiger-left : tiger-left tiger-right : 0.1275
+O: listen listen : tiger-left : tiger-right tiger-left : 0.1275
+O: listen listen : tiger-left : tiger-right tiger-right : 0.0225
+
+# listen listen: tiger-right state
+O: listen listen : tiger-right : tiger-left tiger-left : 0.0225
+O: listen listen : tiger-right : tiger-left tiger-right : 0.1275
+O: listen listen : tiger-right : tiger-right tiger-left : 0.1275
+O: listen listen : tiger-right : tiger-right tiger-right : 0.7225
+
+# For all other joint actions: uniform over all joint observations
+O: listen open-left : tiger-left : tiger-left tiger-left : 0.25
+O: listen open-left : tiger-left : tiger-left tiger-right : 0.25
+O: listen open-left : tiger-left : tiger-right tiger-left : 0.25
+O: listen open-left : tiger-left : tiger-right tiger-right : 0.25
+O: listen open-left : tiger-right : tiger-left tiger-left : 0.25
+O: listen open-left : tiger-right : tiger-left tiger-right : 0.25
+O: listen open-left : tiger-right : tiger-right tiger-left : 0.25
+O: listen open-left : tiger-right : tiger-right tiger-right : 0.25
+
+O: listen open-right : tiger-left : tiger-left tiger-left : 0.25
+O: listen open-right : tiger-left : tiger-left tiger-right : 0.25
+O: listen open-right : tiger-left : tiger-right tiger-left : 0.25
+O: listen open-right : tiger-left : tiger-right tiger-right : 0.25
+O: listen open-right : tiger-right : tiger-left tiger-left : 0.25
+O: listen open-right : tiger-right : tiger-left tiger-right : 0.25
+O: listen open-right : tiger-right : tiger-right tiger-left : 0.25
+O: listen open-right : tiger-right : tiger-right tiger-right : 0.25
+
+O: open-left listen : tiger-left : tiger-left tiger-left : 0.25
+O: open-left listen : tiger-left : tiger-left tiger-right : 0.25
+O: open-left listen : tiger-left : tiger-right tiger-left : 0.25
+O: open-left listen : tiger-left : tiger-right tiger-right : 0.25
+O: open-left listen : tiger-right : tiger-left tiger-left : 0.25
+O: open-left listen : tiger-right : tiger-left tiger-right : 0.25
+O: open-left listen : tiger-right : tiger-right tiger-left : 0.25
+O: open-left listen : tiger-right : tiger-right tiger-right : 0.25
+
+O: open-left open-left : tiger-left : tiger-left tiger-left : 0.25
+O: open-left open-left : tiger-left : tiger-left tiger-right : 0.25
+O: open-left open-left : tiger-left : tiger-right tiger-left : 0.25
+O: open-left open-left : tiger-left : tiger-right tiger-right : 0.25
+O: open-left open-left : tiger-right : tiger-left tiger-left : 0.25
+O: open-left open-left : tiger-right : tiger-left tiger-right : 0.25
+O: open-left open-left : tiger-right : tiger-right tiger-left : 0.25
+O: open-left open-left : tiger-right : tiger-right tiger-right : 0.25
+
+O: open-left open-right : tiger-left : tiger-left tiger-left : 0.25
+O: open-left open-right : tiger-left : tiger-left tiger-right : 0.25
+O: open-left open-right : tiger-left : tiger-right tiger-left : 0.25
+O: open-left open-right : tiger-left : tiger-right tiger-right : 0.25
+O: open-left open-right : tiger-right : tiger-left tiger-left : 0.25
+O: open-left open-right : tiger-right : tiger-left tiger-right : 0.25
+O: open-left open-right : tiger-right : tiger-right tiger-left : 0.25
+O: open-left open-right : tiger-right : tiger-right tiger-right : 0.25
+
+O: open-right listen : tiger-left : tiger-left tiger-left : 0.25
+O: open-right listen : tiger-left : tiger-left tiger-right : 0.25
+O: open-right listen : tiger-left : tiger-right tiger-left : 0.25
+O: open-right listen : tiger-left : tiger-right tiger-right : 0.25
+O: open-right listen : tiger-right : tiger-left tiger-left : 0.25
+O: open-right listen : tiger-right : tiger-left tiger-right : 0.25
+O: open-right listen : tiger-right : tiger-right tiger-left : 0.25
+O: open-right listen : tiger-right : tiger-right tiger-right : 0.25
+
+O: open-right open-left : tiger-left : tiger-left tiger-left : 0.25
+O: open-right open-left : tiger-left : tiger-left tiger-right : 0.25
+O: open-right open-left : tiger-left : tiger-right tiger-left : 0.25
+O: open-right open-left : tiger-left : tiger-right tiger-right : 0.25
+O: open-right open-left : tiger-right : tiger-left tiger-left : 0.25
+O: open-right open-left : tiger-right : tiger-left tiger-right : 0.25
+O: open-right open-left : tiger-right : tiger-right tiger-left : 0.25
+O: open-right open-left : tiger-right : tiger-right tiger-right : 0.25
+
+O: open-right open-right : tiger-left : tiger-left tiger-left : 0.25
+O: open-right open-right : tiger-left : tiger-left tiger-right : 0.25
+O: open-right open-right : tiger-left : tiger-right tiger-left : 0.25
+O: open-right open-right : tiger-left : tiger-right tiger-right : 0.25
+O: open-right open-right : tiger-right : tiger-left tiger-left : 0.25
+O: open-right open-right : tiger-right : tiger-left tiger-right : 0.25
+O: open-right open-right : tiger-right : tiger-right tiger-left : 0.25
+O: open-right open-right : tiger-right : tiger-right tiger-right : 0.25
+
+# ---- Rewards ----
+# R: <joint_action> : <start_state> : <end_state> : <joint_obs> : <reward>
+# Both listen: -2 per agent (joint reward = -2)
+R: listen listen : tiger-left : * : * : -2.0
+R: listen listen : tiger-right : * : * : -2.0
+
+# Both open-left: tiger-right -> both safe -> +20; tiger-left -> both wrong -> -50
+R: open-left open-left : tiger-left : * : * : -50.0
+R: open-left open-left : tiger-right : * : * : 20.0
+
+# Both open-right: tiger-left -> both safe -> +20; tiger-right -> both wrong -> -50
+R: open-right open-right : tiger-left : * : * : 20.0
+R: open-right open-right : tiger-right : * : * : -50.0
+
+# Mismatch: one opens wrong door, other opens right door -> -50 each
+R: open-left open-right : * : * : * : -50.0
+R: open-right open-left : * : * : * : -50.0
+
+# One listens, other opens: uncoordinated -> -101 each
+R: listen open-left : * : * : * : -101.0
+R: listen open-right : * : * : * : -101.0
+R: open-left listen : * : * : * : -101.0
+R: open-right listen : * : * : * : -101.0

@@ -1,0 +1,80 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Test / coverage
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# mypy / ruff
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Experiment outputs.
+# Result CSV/JSON artifacts that back numbers in the paper ARE tracked
+# (reproducibility requirement from the 2026-08-16 academic review); only
+# bulky binaries and scratch caches stay ignored.
+experiments/**/*.h5
+experiments/figures/*.pdf
+experiments/figures/*.png
+!experiments/**/README.md
+
+# Paper build artifacts
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.pdf
+paper/*.toc
+paper/*.bbl
+paper/*.blg
+paper/*.synctex.gz
+paper/*.fdb_latexmk
+paper/*.fls
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+.claude/
+
+# Paper figure PNG previews (PDFs are the canonical committed figures)
+paper/figures/*.png

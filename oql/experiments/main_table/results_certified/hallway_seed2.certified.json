@@ -1,0 +1,23 @@
+{
+  "certified": true,
+  "stride": 2,
+  "k": 1,
+  "tau": 2,
+  "test": "G_RAW_FIXED_ALPHABET",
+  "alpha": 0.05,
+  "epsilon_min": 0.5,
+  "beta": 0.05,
+  "seeds": [
+    2
+  ],
+  "level_correction": "BONFERRONI",
+  "command": "python experiments/main_table/run_certified.py --envs hallway --seeds 2",
+  "commit": "01cf4f1fd3d19bd2a87f24f72500324d15aa5b0a",
+  "python": "3.13.14",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "episodic": false,
+  "actual_stride": 2
+}

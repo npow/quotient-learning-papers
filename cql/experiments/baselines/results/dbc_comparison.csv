@@ -1,0 +1,15 @@
+env,seed,dbc_n_classes,mmd_n_classes,ground_truth,dbc_correct,mmd_correct
+tiger_n2,0,2,2,2,1,1
+tiger_n2,1,2,2,2,1,1
+tiger_n2,2,2,2,2,1,1
+tiger_n2,3,2,2,2,1,1
+tiger_n2,4,2,2,2,1,1
+kcycle_k2,0,2,2,2,1,1
+kcycle_k2,1,2,2,2,1,1
+kcycle_k2,2,2,2,2,1,1
+kcycle_k3,0,2,3,3,0,1
+kcycle_k3,1,2,3,3,0,1
+kcycle_k3,2,2,3,3,0,1
+kcycle_k4,0,2,4,4,0,1
+kcycle_k4,1,2,4,4,0,1
+kcycle_k4,2,2,4,4,0,1

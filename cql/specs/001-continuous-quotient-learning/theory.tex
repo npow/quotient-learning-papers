@@ -1,0 +1,105 @@
+% Proposition and proof for inclusion in the paper's theory section.
+% No preamble; paste into a document that loads amsthm, amsmath, amssymb.
+
+\begin{definition}[History Binning Key]
+Let $\mathcal{O} \subseteq [0,1]^d$ be a compact observation space and let $B \in \mathbb{N}$.
+The \emph{$B$-bin quantile key} $\kappa_B(h)$ of a history
+$h = (o_1, a_1, \ldots, o_t, a_t)$ is obtained by replacing each observation
+$o_s[0]$ (its first coordinate) with its equal-frequency quantile bin index
+$\mathrm{bin}_B(o_s[0]) \in \{1, \ldots, B\}$ determined from the empirical marginal
+distribution of the first observation coordinate over $N$ trajectories.
+Histories that share the same key are pooled into a common \emph{history class};
+their $k$-step continuation vectors are accumulated as raw $\mathbb{R}^{d_{\mathrm{eff}}}$
+observations, where $d_{\mathrm{eff}} = d_{\mathcal{O}} k + d_{\mathcal{A}}(k-1)$.
+\end{definition}
+
+\begin{proposition}[History Binning Approximation Error]
+\label{prop:binning-approx}
+Let $\mathcal{O} \subseteq [0,1]^d$ be a compact observation space.
+Let $B$ be the number of equal-frequency quantile bins applied to the first
+observation dimension for history key generation.
+Let $Q^*$ be the true Myhill--Nerode quotient with $n^*$ equivalence classes, and let
+$\widehat{Q}_B$ be the quotient recovered by the $B$-bin algorithm on $N$ trajectories.
+
+For each class $i \in \{1,\ldots,n^*\}$, let
+$\mu_i = \mathbb{E}[o_t[0] \mid h \in \text{class } i]$
+denote the mean of the first observation coordinate within that class.
+Suppose the following conditions hold:
+\begin{enumerate}[\upshape(a)]
+    \item \textbf{Minimum signal gap.}
+        $\Delta := \min_{i \neq j}\,|\mu_i - \mu_j| > 0$.
+    \item \textbf{Bounded noise.}
+        The marginal distribution of $o_t[0]$ within each class is sub-Gaussian with
+        parameter $\sigma$, satisfying $3\sigma < \Delta/2$
+        (equivalently, classes are at least $6\sigma$ apart).
+    \item \textbf{Sufficient bins.}
+        $B \geq 2n^*$.
+\end{enumerate}
+Then
+\[
+    \Pr\!\bigl[\widehat{Q}_B = Q^*\bigr] \;\longrightarrow\; 1
+    \quad\text{as } N \to \infty.
+\]
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+The argument proceeds in two steps.
+
+\medskip
+\noindent\textbf{Step~1: Each true class occupies at least two bins.}
+Because the equal-frequency quantile boundaries track the empirical marginal distribution
+of $o_t[0]$, the Glivenko--Cantelli theorem implies that these boundaries converge
+uniformly to the population quantile function as $N \to \infty$.
+In the population each of the $n^*$ classes occupies a positive-measure region of that
+marginal (they have distinct means and sub-Gaussian tails), so for large $N$ the quantile
+grid assigns each class at least $\lfloor B / n^* \rfloor \geq 2$ bins with probability
+approaching~$1$.
+
+\medskip
+\noindent\textbf{Step~2: Boundary bins become single-class as $N \to \infty$.}
+A \emph{boundary bin} straddles the population boundary $c_{ij} = (\mu_i + \mu_j)/2$
+between adjacent classes $i$ and $j$.
+An observation from class~$i$ falls in class~$j$'s bin only if it deviates from $\mu_i$
+by at least $\Delta/2 - w/2$, where $w$ is the bin width.
+Since $\Delta/2 > 3\sigma$ (condition~(b)), a sub-Gaussian tail bound gives
+\[
+    \Pr[\text{obs from class } i \text{ lands in class } j\text{'s region}]
+    \;\leq\; 2\exp\!\Bigl(-\frac{\Delta^2}{8\sigma^2}\Bigr)
+    \;\leq\; 2e^{-9/2} < 0.022.
+\]
+The expected number of cross-contaminating observations in any boundary bin is
+$O(N \cdot e^{-\Delta^2/(8\sigma^2)})$, while the total count in the bin grows as
+$\Theta(N/B)$.
+By the Borel--Cantelli lemma, the fraction of boundary-bin observations from the
+wrong class converges to~$0$ almost surely.
+
+\medskip
+\noindent\textbf{Combining the steps.}
+For large $N$, each true class $i$ is represented by at least two bins whose
+continuation pools are exclusively populated by observations from class~$i$.
+The $B$-bin key $\kappa_B(h)$ therefore acts as a refinement of the true class label:
+histories in the same true class receive the same bin sequence; histories in different
+true classes receive different bin sequences (their means are $\Delta$-separated).
+The downstream pooling and equivalence test correctly identifies these groups, yielding
+$\widehat{Q}_B = Q^*$.
+\end{proof}
+
+\begin{corollary}[K-Cycle Environment]
+\label{cor:kcycle}
+For the $K$-cycle environment with observation noise $\sigma \leq \Delta/(6)$
+where $\Delta = 1/K$ is the uniform gap between class means, setting $B = K$
+satisfies conditions~\emph{(a)}--\emph{(c)} of Proposition~\ref{prop:binning-approx}
+asymptotically.
+Consequently, $\Pr[\widehat{Q}_K = Q^*] \to 1$ as $N \to \infty$.
+Setting $B = 2K$ provides the full two-bin slack and is recommended for finite~$N$.
+\end{corollary}
+
+\begin{remark}[Failure modes]
+When $B < 2n^*$, some pairs of true classes must share bins, producing mixed
+continuation pools that cause phantom classes or spurious merges in the equivalence test.
+When $3\sigma \geq \Delta/2$, boundary bins retain a constant fraction of
+cross-contaminating observations at any $N$, and exact recovery fails.
+In both cases the correct remedy is to use the MMD-based estimator
+(Section~\ref{sec:mmd-estimator}), which operates on full continuation vectors
+and is not susceptible to one-dimensional quantile-boundary artifacts.
+\end{remark}

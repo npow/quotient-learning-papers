@@ -1,0 +1,6 @@
+env,seed,n_classes,n_partition_entries,wall_time_s
+MRW(L=5),0,10,10,0.163
+MRW(L=5),1,10,10,0.158
+MRW(L=5),2,10,10,0.163
+MRW(L=5),3,10,10,0.164
+MRW(L=5),4,10,10,0.16

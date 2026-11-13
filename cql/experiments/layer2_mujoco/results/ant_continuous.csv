@@ -1,0 +1,6 @@
+seed,mode,n_classes,runtime_s
+0,continuous,8,42.0
+1,continuous,8,40.9
+2,continuous,8,42.1
+3,continuous,8,41.3
+4,continuous,8,42.2

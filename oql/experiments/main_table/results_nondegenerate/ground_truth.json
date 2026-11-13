@@ -1,0 +1,46 @@
+{
+  "protocol": {
+    "policy": {
+      "id": "stochastic_listen80",
+      "type": "memoryless stochastic",
+      "action_probs": {
+        "listen": 0.8,
+        "open_left": 0.1,
+        "open_right": 0.1
+      }
+    },
+    "eps_rule": "post hoc, mirroring run_certified.py's analytic-gap protocol: eps = 0.35 chosen <= the brute-force closed-loop min TV gap 0.392000; checked at runtime",
+    "ground_truth": "exact brute-force enumeration of the latent chain under the stochastic policy (tiger_closed_loop_laws); episodes that open a door before observation index r+k terminate early and are excluded exactly as the estimand's reach-conditioning prescribes"
+  },
+  "estimand": {
+    "r": 1,
+    "k": 1,
+    "L": 1,
+    "listen_accuracy": 0.85
+  },
+  "budget": {
+    "n_trajectories": 8000,
+    "m_star": 468,
+    "expected_inference_count_per_context": 1600.0
+  },
+  "context_masses": {
+    "(0,)": 0.4,
+    "(1,)": 0.4
+  },
+  "closed_loop_laws": {
+    "(0,)": {
+      "(0,)": 0.696,
+      "(1,)": 0.304
+    },
+    "(1,)": {
+      "(0,)": 0.304,
+      "(1,)": 0.6960000000000001
+    }
+  },
+  "true_partition": {
+    "(0,)": 0,
+    "(1,)": 1
+  },
+  "true_n_classes": 2,
+  "true_min_tv": 0.392
+}

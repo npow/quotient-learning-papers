@@ -1,0 +1,21 @@
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # bugbear
+    "UP",  # pyupgrade
+    "SIM", # simplify
+    "RUF", # ruff-specific
+]
+ignore = [
+    "E501",  # line length (handled by black)
+    "B008",  # function call in default arg (common pattern for dataclasses)
+]
+
+[lint.per-file-ignores]
+"tests/**/*.py" = ["B011"]  # allow `assert False` in tests

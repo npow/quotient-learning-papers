@@ -1,0 +1,6 @@
+seed,policy,n_classes,runtime_s
+0,sinusoidal,8,18.1
+1,sinusoidal,8,17.2
+2,sinusoidal,8,17.8
+3,sinusoidal,8,18.6
+4,sinusoidal,8,20.0

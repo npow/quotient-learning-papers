@@ -1,0 +1,6 @@
+metric,bounded_agent_quotient,psr_spectral
+K (mean ± std),2.00 ± 0.00,3.80 ± 0.40
+Decision loss (mean ± std),0.0000 ± 0.0000,0.0000 ± 0.0000
+Analytical PSR dimension,4,—
+Analytical BA dimension,2,—
+Seeds with K_PSR > K_BA,5/5,—

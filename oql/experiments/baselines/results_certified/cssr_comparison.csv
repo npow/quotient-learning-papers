@@ -1,0 +1,16 @@
+env,seed,estimator_n,cssr_n,expected,estimator_exact,cssr_exact,undetermined_rate
+tiger,0,2,3,2,,,0.0
+tiger,1,2,3,2,,,0.0
+tiger,2,2,3,2,,,0.0
+tiger,3,2,3,2,,,0.0
+tiger,4,2,3,2,,,0.0
+kcycle_8,0,8,9,8,,,0.0
+kcycle_8,1,8,9,8,,,0.0
+kcycle_8,2,8,9,8,,,0.0
+kcycle_8,3,8,9,8,,,0.0
+kcycle_8,4,8,9,8,,,0.0
+noisy_depth2,0,5,6,5,1,1,0.0
+noisy_depth2,1,5,6,5,1,1,0.0
+noisy_depth2,2,5,6,5,1,1,0.0
+noisy_depth2,3,5,6,5,1,1,0.0
+noisy_depth2,4,5,6,5,1,1,0.0

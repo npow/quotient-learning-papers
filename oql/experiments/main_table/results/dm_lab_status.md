@@ -1,0 +1,3 @@
+# DM Lab Status
+
+DM Lab (DeepMind Lab) requires a Bazel build of `dm_lab.so` against a compatible Lua/SDL stack and is not present in this Workbench BDI container. The wrapper `environments/layer2_memory/dmlab_wrapper.py` raises `DMLabUnavailable` at instantiation time (not at import time) so that all other package imports remain unaffected. The graceful-skip behaviour is exercised by the integration test `tests/integration/test_po_mujoco.py` (which applies the same pattern for environments that require optional heavyweight dependencies) and by the import-guard unit tests in `tests/unit/`. DM Lab results will need to be reproduced on a host with the bazel toolchain and the `deepmind_lab` Python wheel; the wrapper API is stable and no algorithm changes are required.

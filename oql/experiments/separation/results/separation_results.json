@@ -1,0 +1,77 @@
+{
+  "environment": "SeparationPOMDP(acc_x=0.9,p_switch_y=0.05,p_switch_x_y0=0.2,p_switch_x_y1=0.05)",
+  "n_seeds": 5,
+  "n_traj": 5000,
+  "ba_history_max_length": 1,
+  "psr_history_length": 2,
+  "psr_spectral_gap_threshold": 0.01,
+  "k_ba_mean": 2.0,
+  "k_ba_std": 0.0,
+  "k_psr_mean": 3.8,
+  "k_psr_std": 0.39999999999999997,
+  "loss_ba_mean": 0.0,
+  "loss_ba_std": 0.0,
+  "loss_psr_mean": 0.0,
+  "loss_psr_std": 0.0,
+  "n_seeds_with_separation": 5,
+  "n_seeds_ba_no_worse": 5,
+  "analytical_psr_dimension": 4,
+  "analytical_ba_dimension": 2,
+  "per_seed": [
+    {
+      "seed": 0,
+      "k_ba": 2,
+      "k_ba_raw": 2,
+      "k_psr": 4,
+      "loss_ba": 0.0,
+      "loss_psr": 0.0,
+      "separation_exists": true,
+      "ba_no_worse_on_decision": true,
+      "elapsed_s": 1.03
+    },
+    {
+      "seed": 1,
+      "k_ba": 2,
+      "k_ba_raw": 2,
+      "k_psr": 4,
+      "loss_ba": 0.0,
+      "loss_psr": 0.0,
+      "separation_exists": true,
+      "ba_no_worse_on_decision": true,
+      "elapsed_s": 1.01
+    },
+    {
+      "seed": 2,
+      "k_ba": 2,
+      "k_ba_raw": 2,
+      "k_psr": 3,
+      "loss_ba": 0.0,
+      "loss_psr": 0.0,
+      "separation_exists": true,
+      "ba_no_worse_on_decision": true,
+      "elapsed_s": 1.03
+    },
+    {
+      "seed": 3,
+      "k_ba": 2,
+      "k_ba_raw": 2,
+      "k_psr": 4,
+      "loss_ba": 0.0,
+      "loss_psr": 0.0,
+      "separation_exists": true,
+      "ba_no_worse_on_decision": true,
+      "elapsed_s": 1.01
+    },
+    {
+      "seed": 4,
+      "k_ba": 2,
+      "k_ba_raw": 2,
+      "k_psr": 4,
+      "loss_ba": 0.0,
+      "loss_psr": 0.0,
+      "separation_exists": true,
+      "ba_no_worse_on_decision": true,
+      "elapsed_s": 1.01
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "certified": false,
+  "misspecification_probe": true,
+  "probe_note": "MISSPECIFICATION PROBE: eps_min=0.5 is deliberately set ABOVE the true TV (0.1) of the engineered pair ((0,), (1,)) of MisspecChain, violating the gap model (paper Eq. 2). This run exhibits the uncertified silent-merge failure mode and certifies NOTHING.",
+  "stride": 0,
+  "k": 1,
+  "tau": 1,
+  "test": "TV_FIXED_ALPHABET",
+  "alpha": 0.05,
+  "epsilon_min": 0.5,
+  "beta": 0.05,
+  "seeds": [
+    7
+  ],
+  "level_correction": "BONFERRONI",
+  "command": "python experiments/main_table/run_misspec.py --seeds 7 --out experiments/main_table/results_misspec",
+  "commit": "91b5c02bc532bcfb998ffee176e67d60b287acef",
+  "python": "3.13.14",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "sampling_scheme": "INDEPENDENT_TRAJECTORY_BLOCK",
+  "selection_fraction": 0.5,
+  "context_end": 0,
+  "policy_id": "uniform_random",
+  "n_trajectories": 2600,
+  "history_max_length": 1,
+  "min_history_occurrences": 10,
+  "max_steps_per_episode": 3,
+  "m_star": 278,
+  "env_tau_subgap_tv": 0.1,
+  "true_separated_tv": 0.8,
+  "subgap_pair": [
+    "(0,)",
+    "(1,)"
+  ]
+}

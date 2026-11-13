@@ -1,0 +1,89 @@
+# Tiny synthetic coordination problem: 2 states, 2 actions/agent, 2 obs/agent.
+# State 0 (A) and state 1 (B). Agents win (+1) when both pick the same action
+# that matches the hidden state (both pick 0 in state 0, or both pick 1 in
+# state 1). Otherwise reward is -1. After any joint action state resets
+# uniformly.
+
+agents: 2
+discount: 0.9
+values: reward
+
+states: s0 s1
+
+start: uniform
+
+actions:
+a0 a1
+a0 a1
+
+observations:
+o0 o1
+o0 o1
+
+# Transitions: always reset uniformly (no persistent state)
+T: a0 a0 : s0 : s0 : 0.5
+T: a0 a0 : s0 : s1 : 0.5
+T: a0 a0 : s1 : s0 : 0.5
+T: a0 a0 : s1 : s1 : 0.5
+
+T: a0 a1 : s0 : s0 : 0.5
+T: a0 a1 : s0 : s1 : 0.5
+T: a0 a1 : s1 : s0 : 0.5
+T: a0 a1 : s1 : s1 : 0.5
+
+T: a1 a0 : s0 : s0 : 0.5
+T: a1 a0 : s0 : s1 : 0.5
+T: a1 a0 : s1 : s0 : 0.5
+T: a1 a0 : s1 : s1 : 0.5
+
+T: a1 a1 : s0 : s0 : 0.5
+T: a1 a1 : s0 : s1 : 0.5
+T: a1 a1 : s1 : s0 : 0.5
+T: a1 a1 : s1 : s1 : 0.5
+
+# Observations: noisy signal about state (80% accurate for agent 0, uniform for agent 1)
+O: a0 a0 : s0 : o0 o0 : 0.4
+O: a0 a0 : s0 : o0 o1 : 0.4
+O: a0 a0 : s0 : o1 o0 : 0.1
+O: a0 a0 : s0 : o1 o1 : 0.1
+
+O: a0 a0 : s1 : o0 o0 : 0.1
+O: a0 a0 : s1 : o0 o1 : 0.1
+O: a0 a0 : s1 : o1 o0 : 0.4
+O: a0 a0 : s1 : o1 o1 : 0.4
+
+O: a0 a1 : s0 : o0 o0 : 0.25
+O: a0 a1 : s0 : o0 o1 : 0.25
+O: a0 a1 : s0 : o1 o0 : 0.25
+O: a0 a1 : s0 : o1 o1 : 0.25
+O: a0 a1 : s1 : o0 o0 : 0.25
+O: a0 a1 : s1 : o0 o1 : 0.25
+O: a0 a1 : s1 : o1 o0 : 0.25
+O: a0 a1 : s1 : o1 o1 : 0.25
+
+O: a1 a0 : s0 : o0 o0 : 0.25
+O: a1 a0 : s0 : o0 o1 : 0.25
+O: a1 a0 : s0 : o1 o0 : 0.25
+O: a1 a0 : s0 : o1 o1 : 0.25
+O: a1 a0 : s1 : o0 o0 : 0.25
+O: a1 a0 : s1 : o0 o1 : 0.25
+O: a1 a0 : s1 : o1 o0 : 0.25
+O: a1 a0 : s1 : o1 o1 : 0.25
+
+O: a1 a1 : s0 : o0 o0 : 0.4
+O: a1 a1 : s0 : o0 o1 : 0.4
+O: a1 a1 : s0 : o1 o0 : 0.1
+O: a1 a1 : s0 : o1 o1 : 0.1
+
+O: a1 a1 : s1 : o0 o0 : 0.1
+O: a1 a1 : s1 : o0 o1 : 0.1
+O: a1 a1 : s1 : o1 o0 : 0.4
+O: a1 a1 : s1 : o1 o1 : 0.4
+
+# Rewards: +1 when both pick action matching state, -1 otherwise
+R: a0 a0 : s0 : * : * : 1.0
+R: a0 a0 : s1 : * : * : -1.0
+R: a1 a1 : s0 : * : * : -1.0
+R: a1 a1 : s1 : * : * : 1.0
+R: a0 a1 : * : * : * : -1.0
+R: a1 a0 : * : * : * : -1.0

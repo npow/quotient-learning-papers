@@ -1,0 +1,13 @@
+{
+  "wall_time_s": 284.59966683387756,
+  "n_rows": 30,
+  "envs": [
+    "tiger",
+    "rocksample_7_8",
+    "tmaze",
+    "sepsis",
+    "robot_localization",
+    "synthetic_200"
+  ],
+  "seeds": 5
+}

@@ -1,0 +1,571 @@
+%% supplement.tex — Supplementary Material
+%% Myhill-Nerode Quotient Learning via Kernel MMD (continuous spaces)
+
+
+\documentclass[10pt]{article}
+
+%% --- Page geometry ---
+\usepackage[margin=1in]{geometry}
+
+%% --- Core packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{enumerate}
+
+%% --- Theorem environments ---
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{remark}{Remark}[section]
+\newtheorem{fact}{Fact}[section]
+
+%% --- Math macros (identical to main.tex) ---
+\newcommand{\calQ}{\mathcal{Q}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calK}{\mathcal{K}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbE}{\mathbb{E}}
+\newcommand{\epsMMD}{\varepsilon_{\mathrm{MMD}}}
+\newcommand{\epsmin}{\varepsilon_{\min}}
+\newcommand{\Qstar}{\mathcal{Q}^*}
+\newcommand{\mmd}{\mathrm{MMD}}
+\newcommand{\TV}{\mathrm{TV}}
+\newcommand{\RKHS}{\mathcal{H}_k}
+\newcommand{\phih}{\phi_h}
+\newcommand{\Khist}{K_{\mathrm{hist}}}
+
+%% --- Section labelling as A, B, C, ... ---
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+%% ============================================================
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries Supplementary Material}\\[4pt]
+  {\large Myhill--Nerode Quotient Learning\\
+          for Continuous Observation--Action Spaces\\
+          via Kernel Maximum Mean Discrepancy}\\[4pt]
+  {\normalsize Anonymous Author(s)}
+\end{center}
+
+\vspace{1em}
+
+This document contains the proofs of Lemma~1, Theorem~1 and Proposition~1 of
+the main paper, the exact configuration of every experiment (as run by the
+scripts shipped with the code), and per-seed result tables.  Every number is
+taken from a result file under \texttt{experiments/*/results/}; the file is
+named next to each table.
+
+% ============================================================
+\section{Proofs of Lemma~1 and Theorem~1}
+\label{sec:proof-main}
+% ============================================================
+
+Throughout, $\kappa^2=\sup_x\kappa(x,x)$ and, as required by
+\citet[Thm.~7]{Gretton2012}, $0\le\kappa(x,y)\le\kappa^2$; the RBF kernel
+satisfies both with $\kappa=1$.  For a distribution $P$ let $\mu_P=\bbE_P[\phi(c)]$
+be its mean embedding, so that $\mmd(P,Q)=\|\mu_P-\mu_Q\|_{\RKHS}$.
+
+\subsection{Lemma~1: MMD is dominated by total variation}
+
+\begin{proof}
+For $\|f\|_{\RKHS}\le1$, $|f(x)|=|\langle f,\phi(x)\rangle|\le\kappa$, hence
+\[
+  \mmd(P,Q)=\sup_{\|f\|\le1}\Big|\int f\,d(P-Q)\Big|
+  \le\kappa\,\|P-Q\|_1=2\kappa\,\TV(P,Q).
+\]
+For the second claim, $P_b=\int P^{(k)}_{h',\pi}\,\nu_b(dh')$ where $\nu_b$ is
+the conditional law of the history given the bin, so
+$\mu_{P_b}=\int\mu_{P_{h'}}\nu_b(dh')$ (Bochner integral; the embedding is
+bounded) and
+\[
+  \|\mu_{P_h}-\mu_{P_b}\|_{\RKHS}\le\int\|\mu_{P_h}-\mu_{P_{h'}}\|\,\nu_b(dh')
+  \le2\kappa\int\TV(P_h,P_{h'})\,\nu_b(dh')\le2\kappa L\,w_b .\qedhere
+\]
+\end{proof}
+
+\subsection{Two facts about the biased MMD statistic}
+
+Let $X=(x_1,\dots,x_m)\sim P^{\otimes m}$ and $Y=(y_1,\dots,y_m)\sim Q^{\otimes m}$
+be independent and let $\widehat{\mmd}$ be the square root of the biased
+statistic (Eq.~(1) of the main paper, $m_1=m_2=m$).
+
+\begin{fact}[{\citealp[Thm.~7]{Gretton2012}}]
+\label{fact:dev}
+For every $t>0$,
+$\Pr\big[\,|\widehat{\mmd}-\mmd(P,Q)|>4\kappa/\sqrt m+t\,\big]\le2\exp(-t^2m/(4\kappa^2))$.
+\end{fact}
+
+\begin{fact}[{\citealp[Cor.~9]{Gretton2012}}]
+\label{fact:null}
+If $P=Q$ then, for every $\alpha_0\in(0,1)$,
+$\Pr\big[\widehat{\mmd}>t_{\alpha_0}\big]\le\alpha_0$ with
+$t_{\alpha_0}=\sqrt{2\kappa^2/m}\,\big(1+\sqrt{2\log(1/\alpha_0)}\big)$.
+\end{fact}
+
+\subsection{Per-pair power}
+
+\begin{lemma}[Per-pair decision]
+\label{lem:pair}
+Fix $\alpha_0,\delta'\in(0,1)$ and decide ``different'' iff
+$\widehat{\mmd}>t_{\alpha_0}$.  (i) If $P=Q$ the decision is wrong with
+probability at most $\alpha_0$.  (ii) If $\mmd(P,Q)\ge\varepsilon>0$ and
+\begin{equation}
+  m\;\ge\;\frac{16\kappa^2}{\varepsilon^2}\Big(8+\log\frac{2}{\alpha_0\delta'}\Big),
+  \label{eq:m-pair}
+\end{equation}
+the decision is wrong with probability at most $\delta'$.
+\end{lemma}
+
+\begin{proof}
+(i) is Fact~\ref{fact:null}.  For (ii) put $t=2\kappa\sqrt{\log(2/\delta')/m}$,
+so that $2\exp(-t^2m/(4\kappa^2))=\delta'$.  By Fact~\ref{fact:dev}, with
+probability at least $1-\delta'$,
+$\widehat{\mmd}\ge\varepsilon-4\kappa/\sqrt m-t$, and the decision is correct
+as soon as $\varepsilon-4\kappa/\sqrt m-t>t_{\alpha_0}$, i.e.
+\[
+  \sqrt m\,\varepsilon\;>\;\kappa\Big[4+\sqrt2+2\sqrt{\log(1/\alpha_0)}+2\sqrt{\log(2/\delta')}\Big].
+\]
+Using $(a+b+c+d)^2\le4(a^2+b^2+c^2+d^2)$ the right-hand side squared is at most
+$\kappa^2\big[4(4+\sqrt2)^2+16\log(1/\alpha_0)+16\log(2/\delta')\big]
+\le\kappa^2\big[128+16\log(2/(\alpha_0\delta'))\big]$, and \eqref{eq:m-pair}
+guarantees $m\varepsilon^2$ exceeds this bound.
+\end{proof}
+
+\subsection{Proof of Theorem~1}
+
+\begin{proof}
+Let $\calP$ be the set of tested pairs, $|\calP|\le\Khist^2/2$.  Run the
+decision of Lemma~\ref{lem:pair} on every pair with
+$\alpha_0=\delta'=\delta/\Khist^2$.  With $\varepsilon=\epsMMD$,
+\eqref{eq:m-pair} becomes condition~(2) of the main paper,
+$m\ge(16\kappa^2/\epsMMD^2)(8+\log(2\Khist^4/\delta^2))$.  By a union bound
+the probability that \emph{some} pair is decided wrongly is at most
+$|\calP|(\alpha_0+\delta')\le(\Khist^2/2)(2\delta/\Khist^2)=\delta$.  On the
+complementary event every same-class pair (in $\Qstar_B$) is merged and no
+cross-class pair is merged, so the connected components of the union--find
+graph are exactly the classes of $\Qstar_B$, i.e.\ $\hat\calQ_B=\Qstar_B$.
+
+For the trajectory budget, each trajectory contributes $T'=T-\ell-k+1$
+$(\text{history},\text{continuation})$ pairs; for $\ell=1$ quantile keys have
+equal mass, so each of the $\Khist$ keys receives $NT'/\Khist$ of them (for
+$\ell>1$ replace $1/\Khist$ by the smallest key mass).  Under the
+$\tau$-mixing assumption of the theorem, thinning the within-trajectory
+sequence to windows separated by $\tau+k$ steps leaves
+$m\ge NT'/(c\Khist(\tau+k))$ effectively independent samples per key
+(consecutive continuation windows overlap over $k$ steps and are decorrelated
+after a further $\tau$ steps).  Requiring this to exceed the per-pair bound
+gives
+\[
+  N\;\ge\;\frac{16c\,\kappa^2\,\Khist(\tau+k)}{T'\,\epsMMD^2}
+          \Big(8+\log\frac{2\Khist^4}{\delta^2}\Big)
+   \;=\;O\!\Big(\frac{\Khist(\tau+k)\log(\Khist/\delta)}{T\,\epsMMD^2}\Big)
+\]
+for $T\gg\ell+k$.  If the implementation caps each side at $m_{\max}$
+samples, the theorem applies with $m=\min(m,m_{\max})$, i.e.\ it requires
+$m_{\max}$ to exceed the right-hand side of \eqref{eq:m-pair}.
+\end{proof}
+
+\begin{remark}[Why the constants matter]
+With $\kappa=1$, $\Khist=8$, $\delta=0.05$ the per-pair requirement is
+$m\ge(16/\epsMMD^2)(8+\log(2\cdot8^4/0.05^2))\approx 400/\epsMMD^2$.  At the
+sample cap $m_{\max}=300$ used in the experiments this guarantees detection
+only for $\epsMMD\gtrsim1.15$; the permutation test is far less conservative
+than the analytic threshold in practice, but the calculation shows that
+distinctions with small MMD gaps are \emph{not} resolved at $m_{\max}=300$,
+which is the mechanism behind Remark~4 of the main paper.
+\end{remark}
+
+% ============================================================
+\section{Proof of Proposition~1}
+\label{sec:proof-prop1}
+% ============================================================
+
+Setting: $\ell=1$; a history is keyed by the bin of the scalar $z=z(o_t)$;
+the POMDP has finite latent index $n$ with class map $c$; $F$ is the pooled
+CDF of $z$ (over trajectories and time steps) and $F_N$ its empirical
+counterpart.  Empirical edges are $\hat e_j=F_N^{-1}(j/B)$ and population edges
+$e_j=F^{-1}(j/B)$, $j=1,\dots,B-1$.
+
+\paragraph{Glivenko--Cantelli.}
+The $N$ trajectories are i.i.d.\ blocks of $T$ observations, so
+$F_N(x)=N^{-1}\sum_i G_i(x)$ with $G_i(x)=T^{-1}\sum_t\mathbf 1\{z^{(i)}_t\le x\}$
+i.i.d.\ in $i$; the class $\{x\mapsto G_i(x)\}$ is monotone and bounded, so
+$\sup_x|F_N(x)-F(x)|\to0$ almost surely.
+
+\paragraph{Under (a) and (b).}
+Let $G_i=(\sup I_i,\inf I_{i+1})$ be the $i$-th gap; $F$ is constant on
+$\overline{G_i}$ at level $q_i=\sum_{j\le i}p_j$, and by (b) $q_i=j_i/B$ for an
+integer $j_i$.  Hence the population edge $e_{j_i}$ lies in $\overline{G_i}$ and
+every population bin is contained in a single $I_i$: all population bins are
+pure, $P_b=P_{c(b)}$, and $\Qstar_B$ is the class partition (each class has
+mass $p_i\ge1/B$ by (b), so each class owns at least one bin), i.e.\
+$|\Qstar_B|=n$.
+
+For the empirical edges, $F_N(\sup I_i)-q_i=O_P(N^{-1/2})$ ($T$ fixed), so
+the number of observations of class $i$ (resp.\ $i{+}1$) that fall on the wrong
+side of $\hat e_{j_i}$ is $O_P(T\sqrt N)$, while each bin holds $NT/B$
+observations.  Thus the foreign-class \emph{fraction} of every empirical bin is
+$O_P(B/\sqrt N)\to0$ (asymptotic purity), and by the mixture identity
+$\mmd(\lambda P+(1-\lambda)P',P)=(1-\lambda)\mmd(P,P')$ the MMD between an
+empirical bin law and its class law is $O_P(B/\sqrt N)$.
+
+Now run variant~(T) with level $\alpha_N\to0$, $\log(1/\alpha_N)/m_N\to0$,
+where $m_N=\Theta(N)$ is the per-bin sample size (no cap).  The null threshold
+is $t_{\alpha_N}=\sqrt{2\kappa^2/m_N}(1+\sqrt{2\log(1/\alpha_N)})$, so
+$\sqrt{m_N}\,t_{\alpha_N}\to\infty$ while
+$\sqrt{m_N}\cdot O_P(B/\sqrt N)=O_P(1)$: same-class pairs have
+$\widehat{\mmd}\le O_P(1/\sqrt{m_N})+O_P(B/\sqrt N)<t_{\alpha_N}$ eventually,
+so they are merged, with probability $\to1$.  Cross-class pairs have a fixed
+gap $\varepsilon>0$ while $t_{\alpha_N}\to0$, so by Fact~\ref{fact:dev} they
+are split with probability $\to1$.  A union bound over the finitely many
+pairs gives $\Pr[\hat\calQ_B=\Qstar_B]\to1$.
+
+\paragraph{Under (a) alone.}
+Population edges that are not in a gap fall inside some $I_i$; a bin that
+contains a gap $G_i$ in its interior (no edge in $\overline{G_i}$) is a
+\emph{straddling} bin.  There are $n-1$ gaps, so at most $n-1$ straddling
+bins.  A straddling bin's law is $\sum_j\lambda_jP_j$ over the classes it
+intersects with all $\lambda_j\in(0,1)$; for two consecutive classes,
+$\mmd(\lambda P_i+(1-\lambda)P_{i+1},P_i)=(1-\lambda)\mmd(P_i,P_{i+1})>0$, so
+it is distinct from every pure law and contributes at most one extra class.
+If every class has mass at least $2/B$, every class also owns a pure bin, and
+$n\le|\Qstar_B|\le2n-1$.  The recovery argument above applies verbatim to
+$\Qstar_B$ (the straddling bins' mixture weights are $N$-independent).
+
+\paragraph{Without (a): unbounded noise.}
+If the class-conditional laws of $z$ have overlapping supports (e.g.\ Gaussian
+noise), $F$ is strictly increasing, every bin contains observations of at least
+two classes with fixed positive proportions, and the bin laws are proper
+mixtures whose weights do not depend on $N$.  The bound
+$\Pr[\text{cross}]\le2e^{-\Delta^2/(8\sigma^2)}$ for sub-Gaussian noise with
+class-mean gap $\Delta$ bounds the \emph{proportion} of foreign observations
+in a boundary bin by $\approx2Be^{-\Delta^2/(8\sigma^2)}$; this proportion is
+constant in $N$, so a consistent test eventually splits the boundary bin (an
+earlier version of this proposition claimed the proportion vanishes by
+Borel--Cantelli, which is false).  Generically all bin laws are then distinct
+and $|\Qstar_B|=\Khist$; the finite-sample estimate is a coarsening at the
+test's resolution (Remark~4 of the main paper), which is the regime of all
+Gaussian-noise experiments in the paper.
+
+\paragraph{The environments of the paper.}
+K-cycle: $z=o=s/K+\xi$, classes of equal mass $1/K$; with $B=K$ the population
+edges are $F^{-1}(j/K)$, which by the symmetry of the equal-weight mixture lie
+at the midpoints $(j-\tfrac12)/K$ up to exponentially small tail terms, so (b)
+holds approximately while (a) fails ($\xi$ Gaussian).  Gaussian-mixture random
+walk: uniform stationary law, $B=N_s$, same situation.  Tiger: symmetric
+marginal, so the median edge is at $0$ and any even $B$ is aligned with the
+sign boundary.  Chain and Dec-Tiger: $B=4$ aligned as above.
+
+% ============================================================
+\section{Experimental Details}
+\label{sec:envs}
+% ============================================================
+
+Common defaults (\texttt{ContinuousEstimatorConfig}): history length
+$\ell=1$, window $k=2$, $m_{\min}=20$, $m_{\max}=300$ continuation vectors per
+side (deterministic per-pair subsampling), RBF kernel with the median heuristic
+$2\sigma^2=\mathrm{median}\{\|x-y\|^2\}$ over at most 500 pooled points,
+permutation $p$-value $(1+\#\{\ge\})/(R+1)$, Benjamini--Hochberg at level
+$\alpha$ over all pairs.  Deviations are listed per experiment.
+
+\subsection{Tiger (\texttt{envs/tiger\_continuous.py})}
+States $\{\text{Left},\text{Right}\}$, uniform initial state; actions
+$\{\text{listen},\text{open-left},\text{open-right}\}$; an open action re-draws
+the state uniformly.  Observation $o=\mathrm{sgn}\cdot1+\mathcal N(0,\sigma^2)$
+with $\mathrm{sgn}=-1$ (Left), $+1$ (Right), $\sigma=0.5$.  Uniform-random
+policy, $T=20$.  Latent index $n=2$.  Estimator: $B=8$ (package default),
+$\alpha=0.01$, $R=199$.  Main run: $N=3000$, 10 seeds
+(\texttt{layer1\_ground\_truth/results/tiger\_continuous.csv}); $N$-sensitivity:
+$N\in\{1000,3000,10000\}$, 5 seeds (\texttt{tiger\_N\_sensitivity.csv});
+ablation: $N\in\{500,1000,2000,5000\}$, 3 seeds, $B=2$, $\alpha=0.05$, $R=99$
+(\texttt{baselines/results/ablation\_sample\_efficiency.csv}).
+
+\subsection{K-cycle (\texttt{envs/kcycle\_continuous.py})}
+States $\{0,\dots,K-1\}$, deterministic increment mod $K$, uniform initial
+state; observation $o=s/K+\mathcal N(0,0.1^2)$ (equally spaced means; the
+$\sin(2\pi s/K)$ variant used in an earlier draft is not injective for even
+$K$ and is not used); single null action; $T=50$.  Latent index $n=K$.
+Estimator: $B=K$, $\alpha=0.01$, $R=199$, $N=3000$ ($5000$ for $K=16$),
+10 seeds (\texttt{kcycle\_continuous.csv}).  Bin sensitivity: $B=2K$, 5 seeds
+(\texttt{kcycle\_bins\_sensitivity.csv}).
+
+\subsection{Gaussian-mixture random walk (\texttt{envs/gaussian\_mixture\_pomdp.py})}
+$N_s\in\{3,4,5,6\}$ states, $s'=\mathrm{clip}(s+\delta,0,N_s-1)$,
+$\delta\sim\mathrm{Unif}\{-1,0,1\}$; $o=s+\mathcal N(0,0.15^2)$; $T=50$,
+$N=2000$; $\alpha=0.05$, $R=99$; $B=N_s$ (manual) and $B$ auto-selected by
+silhouette over $\{2,\dots,32\}$ (Algorithm~2 below); 5 seeds
+(\texttt{gaussian\_mixture.csv}).
+
+\subsection{PO-HalfCheetah and PO-Ant (\texttt{layer2\_mujoco/})}
+\texttt{HalfCheetah-v4}: 17-dim observation (8 joint positions, 9 joint
+velocities); the wrapper zeroes indices $0$--$8$, leaving 8 velocity
+coordinates.  \texttt{Ant-v4}: 27-dim observation; indices $13$--$26$ (14
+velocities) are kept.  Zero-torque policy (and, for HalfCheetah, torques
+$\propto\sin(\omega t+\phi_i)$ per joint); $N=5000$, $T=50$, $B=8$,
+$\alpha=0.05$, $R=99$, 5 seeds (\texttt{halfcheetah\_continuous.csv},
+\texttt{halfcheetah\_sinusoidal.csv}, \texttt{ant\_continuous.csv});
+auto-bin: 3 seeds (\texttt{halfcheetah\_autobin.csv}).
+
+Class statistics and value prediction are in
+\path{halfcheetah_class_returns.csv},
+\path{halfcheetah_value_prediction.csv} and
+\path{halfcheetah_sinusoidal_value.csv}.  The binning scalar is
+$z(o)=\|o\|_2$ (velocity norm).  No discretised G-test baseline is reported:
+no result file exists for it.
+
+\subsection{Dec-Tiger and chain Dec-POMDPs (\texttt{layer3\_rcrit/})}
+\label{sec:rcrit-details}
+Both agents run a listen-only policy so the latent state is constant within an
+episode; $N=1000$, $T=20$, $B=4$, $m_{\min}=10$, $\alpha=0.05$, $R=99$.
+Dec-Tiger: $o^i=\mathrm{sgn}+\mathcal N(0,\sigma_i^2)$; chain: 4-state random
+walk (uniform stationary law), $o^i=s/4+\mathcal N(0,\sigma_i^2)$.  Each agent's
+quotient is fitted independently; each step is labelled by the class of its
+binned key; $\hat R_{\rm crit}=H(\hat Q_A,\hat Q_B)-H(\hat Q_B)$ (plug-in
+entropies, clamped at $0$).
+
+\paragraph{Analytical $H(Q_A\mid Q_B)$.}
+Dec-Tiger: $Q_i=\mathrm{sign}(o^i)$ (the $B=4$ quantile edges of a symmetric
+marginal put the middle edge at $0$), so $p_i=\Pr[Q_i\ne s]=\Phi(-1/\sigma_i)$.
+With $\Pr[s=\pm1]=\tfrac12$,
+\begin{align*}
+  \Pr(Q_A=Q_B=s)     &=\tfrac12(1-p_A)(1-p_B)+\tfrac12p_Ap_B \quad(\text{each sign}),\\
+  \Pr(Q_A\ne Q_B)    &=\tfrac12(1-p_A)p_B+\tfrac12p_A(1-p_B)\quad(\text{each pattern}),
+\end{align*}
+and $H(Q_A\mid Q_B)=H(Q_A,Q_B)-H(Q_B)$.  Symmetric $\sigma=0.5$:
+$p=\Phi(-2)=0.0228$, $H(Q_A\mid Q_B)=0.2624$ bits.  Asymmetric
+$(\sigma_A,\sigma_B)=(0.1,1.0)$: $p_A=\Phi(-10)\approx0$, $p_B=\Phi(-1)=0.1587$,
+$H(Q_A\mid Q_B)=H_b(0.1587)=0.6311$ bits; ratio $2.41$.  Sweep values
+($\sigma_A=0.1$): $\sigma_B=0.1,0.2,0.5,1.0,2.0\mapsto0.0000,0.0000,0.1566,0.6311,0.8915$.
+(An earlier draft wrote these formulas with a threshold at $0.5$ and
+$\Phi(-0.5/\sigma)$; that does not match the environment or the numbers.)
+Chain: agent $i$ classifies $s$ by the nearest mean, i.e.\ intervals with edges
+$(2s+1)/8$; $\Pr(Q_i=j\mid s)=\Phi((\text{hi}_j-s/4)/\sigma_i)-\Phi((\text{lo}_j-s/4)/\sigma_i)$;
+joint over uniform $s$; values $\sigma_B=0.1,0.2,0.5,1.0\mapsto1.0584,1.4462,1.8576,1.9642$ bits.
+
+\subsection{Baselines (\texttt{baselines/})}
+G-test: quantile discretisation of the (scalar) observation into 3 or 8
+symbols, then the finite-alphabet estimator of the companion paper
+($\alpha=0.01$).  Wasserstein-$\varepsilon$: same continuation matrices,
+$W_1$ between first-coordinate projections, merge iff $W_1<\varepsilon$.  DBC:
+MLP encoder trained on $(d_{\rm embed}(h_1,h_2)-W_1(P_{h_1},P_{h_2}))^2$,
+$k$-means with silhouette selection of $k$.  Result files:
+\path{ablation_sample_efficiency.csv},
+\path{bisim_comparison.csv} and \path{dbc_comparison.csv}.
+
+% ============================================================
+\section{Additional Results}
+\label{sec:ablations}
+% ============================================================
+
+\subsection{Auto bin selection}
+
+\begin{algorithm}[h]
+\caption{\textsc{AutoBinSelection} (Algorithm~2)}
+\label{alg:autobin}
+\begin{algorithmic}[1]
+\Require Trajectories, $B_{\min}=2$, $B_{\max}=32$, subsample size 2000.
+\For{$B\in\{B_{\min},\dots,B_{\max}\}$}
+  \State $k$-means with $B$ clusters on the subsampled binning scalars $z(o)$; silhouette score $s_B$.
+\EndFor
+\State \Return $\arg\max_Bs_B$.
+\end{algorithmic}
+\end{algorithm}
+
+Silhouette measures cluster quality in \emph{observation} space and is a
+heuristic proxy for the number of latent classes; it under-estimates $B$ when
+classes share observation marginals.  Results: GaussMix---$B=N_s$ on all 20
+runs, and the auto-$B$ estimate equals the manual one on every run
+(\texttt{gaussian\_mixture.csv}); PO-HalfCheetah (passive)---$B=3$ on all 3
+seeds with $\hat n=3,3,2$ (\texttt{halfcheetah\_autobin.csv}).
+
+\subsection{K-cycle per-seed results and runtime}
+
+\begin{table}[h]
+\centering
+\caption{K-cycle at $B=K$ (\texttt{kcycle\_continuous.csv}): all 60 runs return
+  $\hat n=K$.  Wall-clock per run on one CPU core.}
+\begin{tabular}{rrrrc}
+\toprule
+$K$ & Seeds & $\hat n$ & Runtime (s) & Correct \\
+\midrule
+2  & 0--9 & 2  & 2.9--3.6   & 10/10 \\
+3  & 0--9 & 3  & 3.0--4.4   & 10/10 \\
+4  & 0--9 & 4  & 4.0--5.1   & 10/10 \\
+5  & 0--9 & 5  & 5.2--6.1   & 10/10 \\
+8  & 0--9 & 8  & 8.0--11.7  & 10/10 \\
+16 & 0--9 & 16 & 30.4--37.3 & 10/10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{K-cycle at $B=2K$, 5 seeds (\texttt{kcycle\_bins\_sensitivity.csv}).
+  Over-provisioned bins are split whenever the half-class bins' posteriors
+  differ detectably ($3\le K\le8$); at $K=16$ the 32 bins are close enough that
+  single-linkage chaining merges neighbours and the estimate falls below $K$.}
+\label{tab:kcycle-2k}
+\begin{tabular}{rrrl}
+\toprule
+$K$ & $B$ & $N$ & $\hat n$ per seed \\
+\midrule
+2 & 4 & 3000 & 2, 2, 2, 2, 2 \\
+3 & 6 & 3000 & 3, 4, 3, 4, 4 \\
+4 & 8 & 3000 & 8, 8, 8, 8, 8 \\
+5 & 10 & 3000 & 10, 10, 10, 10, 10 \\
+8 & 16 & 3000 & 16, 16, 16, 16, 16 \\
+16 & 32 & 5000 & 12, 15, 10, 8, 15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Tiger vs.\ $N$}
+$B=8$, $\alpha=0.01$, $R=199$, 5 seeds (\texttt{tiger\_N\_sensitivity.csv}):
+$\hat n=2$ on every seed at $N=1000$, $3000$ and $10000$.  Ablation runs
+($B=2$, $\alpha=0.05$, $R=99$): $\hat n=2$ on 3/3 seeds at every
+$N\in\{500,1000,2000,5000\}$.
+
+\subsection{Dec-Tiger per-seed results}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Dec-Tiger, $\alpha=0.05$, $R=99$, all seeds
+  (\texttt{dec\_tiger\_asymmetric.csv}; seeds 0--4 of the symmetric block are
+  also in \texttt{dec\_tiger\_rcrit.csv}).  Analytical: $0.2624$ (symmetric),
+  $0.6311$ (asymmetric).}
+\label{tab:rcrit-full}
+\begin{tabular}{c|cccr|cccr}
+\toprule
+ & \multicolumn{4}{c|}{$(\sigma_A,\sigma_B)=(0.5,0.5)$} & \multicolumn{4}{c}{$(\sigma_A,\sigma_B)=(0.1,1.0)$}\\
+Seed & $\hat n_A$ & $\hat n_B$ & $\hat R_{\rm crit}$ & rel.\ err. & $\hat n_A$ & $\hat n_B$ & $\hat R_{\rm crit}$ & rel.\ err. \\
+\midrule
+0 & 2 & 3 & 0.2662 & 1.5\%   & 2 & 4 & 0.5698 & 9.7\% \\
+1 & 3 & 2 & 0.7651 & 191.6\% & 2 & 4 & 0.5567 & 11.8\% \\
+2 & 2 & 2 & 0.2671 & 1.8\%   & 2 & 4 & 0.5544 & 12.2\% \\
+3 & 2 & 3 & 0.2633 & 0.4\%   & 2 & 4 & 0.5545 & 12.1\% \\
+4 & 2 & 2 & 0.2625 & 0.0\%   & 2 & 4 & 0.5654 & 10.4\% \\
+5 & 3 & 3 & 0.7690 & 193.1\% & 3 & 4 & 1.0774 & 70.7\% \\
+6 & 3 & 2 & 0.7607 & 189.9\% & 2 & 4 & 0.5700 & 9.7\% \\
+7 & 3 & 3 & 0.7704 & 193.6\% & 2 & 4 & 0.5622 & 10.9\% \\
+8 & 3 & 3 & 0.7624 & 190.5\% & 2 & 4 & 0.5489 & 13.0\% \\
+9 & 2 & 2 & 0.2608 & 0.6\%   & 2 & 4 & 0.5530 & 12.4\% \\
+\midrule
+mean$\pm$std (all) & & & $0.515\pm0.264$ & 96.3\% & & & $0.611\pm0.164$ & 17.3\% \\
+median (all)       & & & 0.514 & 95.8\%  & & & 0.559 & 12.0\% \\
+mean$\pm$std ($\hat n_A=2$) & & & $0.264\pm0.003$ & 0.9\% & & & $0.559\pm0.008$ & 11.4\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Over-splitting of agent~A ($\hat n_A=3$) triples the estimate; over-splitting of
+agent~B is harmless.  The mechanism is the resolution effect: with
+$\sigma=0.5$ the posteriors of the two same-side bins differ by up to
+$\approx0.05$ in posterior weight (the $B{=}4$ quantile bins of a $\pm1$, $\sigma{=}0.5$ marginal give $\Pr(\text{Right}\mid b)\approx0.0001$ and $0.045$ for the two left-side bins), at the edge of what $R=99$ permutations and
+$m_{\max}=300$ resolve, and BH with only six $p$-values rejects all of them
+once all six reach the floor $1/(R+1)=0.01$.  Table~\ref{tab:rcrit-alpha001}
+reports the sensitivity run at $\alpha=0.01$ with $R=999$ (at $R=99$ the floor
+equals $\alpha$ and every quotient collapses to one class).
+
+\begin{table}[h]
+\centering
+\small
+\caption{Dec-Tiger, $\alpha=0.01$, $R=999$, 10 seeds
+  (\texttt{dec\_tiger\_sym\_alpha001\_R999.csv},
+  \texttt{dec\_tiger\_asym\_alpha001\_R999.csv}).}
+\label{tab:rcrit-alpha001}
+\begin{tabular}{lcccc}
+\toprule
+Condition & $\hat n_A$ per seed & $\hat n_B$ per seed & $\hat R_{\rm crit}$ mean$\pm$std & median rel.\ err. \\
+\midrule
+$(0.5,0.5)$ & 2 (9 seeds), 3 (seed 6) & 2 (8), 3 (2) & $0.319\pm0.156$ (all), $0.270\pm0.007$ ($\hat n_A{=}2$) & 3.2\% \\
+$(0.1,1.0)$ & 2 (10) & 4 (10) & $0.561\pm0.010$ & 11.4\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Noise sweep per level}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Sweep, $\sigma_A=0.1$, 5 seeds per level (\texttt{rcrit\_sweep.csv},
+  \texttt{chain\_rcrit.csv}).  Relative errors are undefined when the
+  analytical value is $0$; absolute errors are given.}
+\begin{tabular}{lrrrrl}
+\toprule
+Env & $\sigma_B$ & analytical & $\hat R_{\rm crit}$ mean$\pm$std & mean abs.\ err.\ (bits) & $\hat n_A$ / $\hat n_B$ \\
+\midrule
+Dec-Tiger & 0.1 & 0.0000 & $0.081\pm0.055$ & 0.081 & 2 / 2 \\
+Dec-Tiger & 0.2 & 0.0000 & $0.081\pm0.055$ & 0.081 & 2 / 2 \\
+Dec-Tiger & 0.5 & 0.1566 & $0.180\pm0.016$ & 0.024 (median rel.\ 12.6\%) & 2 / \{2,3\} \\
+Dec-Tiger & 1.0 & 0.6311 & $0.560\pm0.007$ & 0.071 (median rel.\ 11.8\%) & 2 / 4 \\
+Dec-Tiger & 2.0 & 0.8915 & $0.878\pm0.021$ & 0.022 (median rel.\ 2.5\%) & 2 / \{2,3,4\} \\
+\midrule
+Chain & 0.1 & 1.0584 & $1.062\pm0.008$ & 0.007 (0.67\%) & 4 / 4 \\
+Chain & 0.2 & 1.4462 & $1.450\pm0.007$ & 0.005 (0.33\%) & 4 / 4 \\
+Chain & 0.5 & 1.8576 & $1.879\pm0.026$ & 0.026 (1.40\%) & 4 / \{2,3,4\} \\
+Chain & 1.0 & 1.9642 & $2.000\pm0.000$ & 0.036 (1.82\%) & 4 / 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Neural encoder}
+The code ships a GRU/InfoNCE history encoder
+(\texttt{neural\_encoder.py}) trained on the MMD partition; no results for it
+are reported in this paper because no result files were produced.
+
+\subsection{PO-HalfCheetah class statistics and value prediction}
+Tables~\ref{tab:halfcheetah_class_returns}--\ref{tab:sinval} follow.
+
+\input{halfcheetah_class_returns}
+\input{halfcheetah_value_prediction}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+Model & $R^2$ & MAE \\
+\midrule
+Null (constant mean) & 0.000 & 1.551 \\
+Quotient classes (auto-selected $B$) & 0.163 & 1.426 \\
+Velocity $\ell_2$ (oracle) & 0.082 & 1.492 \\
+\bottomrule
+\end{tabular}
+\caption{Class-conditioned value prediction on PO-HalfCheetah under the
+  sinusoidal locomotion policy ($\gamma=0.99$, $101{,}000$ time steps;
+  \texttt{halfcheetah\_sinusoidal\_value.csv}).}
+\label{tab:sinval}
+\end{table}
+\clearpage
+
+% ============================================================
+%  References
+% ============================================================
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}

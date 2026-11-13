@@ -1,0 +1,29 @@
+{
+  "certified": true,
+  "stride": 0,
+  "k": 1,
+  "tau": 1,
+  "test": "TV_FIXED_ALPHABET",
+  "alpha": 0.05,
+  "epsilon_min": 0.35,
+  "beta": 0.05,
+  "seeds": [
+    18
+  ],
+  "level_correction": "BONFERRONI",
+  "command": "python experiments/main_table/run_nondegenerate.py --seeds 18 --out experiments/main_table/results_nondegenerate",
+  "commit": "91b5c02bc532bcfb998ffee176e67d60b287acef",
+  "python": "3.13.14",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "sampling_scheme": "INDEPENDENT_TRAJECTORY_BLOCK",
+  "selection_fraction": 0.5,
+  "context_end": 1,
+  "policy_id": "stochastic_listen80",
+  "n_trajectories": 8000,
+  "history_max_length": 1,
+  "min_history_occurrences": 10,
+  "max_steps_per_episode": 15
+}

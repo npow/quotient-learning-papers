@@ -1,0 +1,7 @@
+{
+  "wall_time_s": 1.940976858139038,
+  "mode": "exact",
+  "phase_transition_accuracy": 1.0,
+  "mean_relative_error": 0.0030600184112175737,
+  "n_rows": 60
+}

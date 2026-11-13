@@ -1,0 +1,29 @@
+{
+  "certified": true,
+  "stride": 0,
+  "k": 1,
+  "tau": 1,
+  "test": "TV_FIXED_ALPHABET",
+  "alpha": 0.05,
+  "epsilon_min": 0.5,
+  "beta": 0.05,
+  "seeds": [
+    8
+  ],
+  "level_correction": "BONFERRONI",
+  "command": "python experiments/main_table/run_abstention_sweep.py --seeds 8 --out experiments/main_table/results_abstention_sweep",
+  "commit": "617a304c8f40639a384ceafbd6c1c0ac2d3ee641",
+  "python": "3.13.14",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "sampling_scheme": "INDEPENDENT_TRAJECTORY_BLOCK",
+  "selection_fraction": 0.5,
+  "context_end": 0,
+  "policy_id": "uniform_random",
+  "n_trajectories": 7500,
+  "history_max_length": 1,
+  "min_history_occurrences": 100,
+  "max_steps_per_episode": 20
+}

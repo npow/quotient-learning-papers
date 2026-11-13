@@ -1,0 +1,29 @@
+{
+  "certified": true,
+  "stride": 0,
+  "k": 1,
+  "tau": 1,
+  "test": "TV_FIXED_ALPHABET",
+  "alpha": 0.05,
+  "epsilon_min": 0.5,
+  "beta": 0.05,
+  "seeds": [
+    9
+  ],
+  "level_correction": "BONFERRONI",
+  "command": "python experiments/main_table/run_sweep_depth2.py --seeds 9 --out experiments/main_table/results_sweep_depth2",
+  "commit": "91b5c02bc532bcfb998ffee176e67d60b287acef",
+  "python": "3.13.14",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "sampling_scheme": "INDEPENDENT_TRAJECTORY_BLOCK",
+  "selection_fraction": 0.5,
+  "context_end": 0,
+  "policy_id": "uniform_random",
+  "n_trajectories": 1000,
+  "history_max_length": 1,
+  "min_history_occurrences": 30,
+  "max_steps_per_episode": 4
+}
