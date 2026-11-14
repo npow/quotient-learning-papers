@@ -38,6 +38,8 @@ def run_one(args):
         B = auto_select_bins(data.dataset)
     elif b_rule == "f8":
         B = 8
+    elif b_rule == "2n":
+        B = 2 * sp.n_latent
     else:
         B = sp.n_latent
     extra = ""
@@ -50,8 +52,9 @@ def run_one(args):
         bin_class = {key[0]: cid for key, cid in q.partition.items()}
         n_hat = q.n_classes
     else:
-        mode = "analytic" if estimator == "T" else "perm_bh"
-        cfg = VariantTConfig(n_bins=B, mode=mode, alpha=sp.alpha, n_permutations=sp.R, seed=seed)
+        mode = "analytic" if estimator.startswith("T") else "perm_bh"
+        sampling = "per_traj" if estimator.endswith("_traj") else "per_bin"
+        cfg = VariantTConfig(n_bins=B, mode=mode, alpha=sp.alpha, n_permutations=sp.R, seed=seed, sampling=sampling)
         res = fit_variant_t(data.dataset, cfg)
         bnd, bin_class, n_hat = res.boundaries, res.bin_class, res.n_classes
         ms = [p["m"] for p in res.pair_info]
@@ -59,7 +62,7 @@ def run_one(args):
     ari, cov = ari_from_bin_labels(data, bnd, bin_class)
     ceil = ari_bin_ceiling(data, bnd)
     return dict(env=env, n_true=sp.n_latent, N=sp.N, seed=seed, estimator=estimator, b_rule=b_rule, B=B,
-                alpha=sp.alpha if estimator != "T" else "delta=0.05", R=sp.R if estimator != "T" else 0,
+                alpha=sp.alpha if not estimator.startswith("T") else "delta=0.05", R=sp.R if not estimator.startswith("T") else 0,
                 n_hat=n_hat, ari=round(ari, 4), ari_ceiling=round(ceil, 4), coverage=round(cov, 4), extra=extra,
                 runtime_s=round(time.perf_counter() - t0, 1))
 
@@ -77,10 +80,10 @@ def main():
     a = ap.parse_args()
     jobs = [(e, s, r, est) for e in a.envs for s in range(a.seeds) for r in a.rules for est in a.estimators]
     # most expensive first
-    jobs = [j for j in jobs if not (j[3] == 'Pfix' and j[2] == 'sil')]
+    jobs = [j for j in jobs if not (j[3].startswith('Pfix') and j[2] == 'sil')]
     if a.pfix_envs is not None:   # Pfix is ~3x slower than P: run it only on the listed envs
-        jobs = [j for j in jobs if j[3] != 'Pfix' or j[0] in a.pfix_envs]
-    jobs.sort(key=lambda j: (j[3] == 'T', ))
+        jobs = [j for j in jobs if not j[3].startswith('Pfix') or j[0] in a.pfix_envs]
+    jobs.sort(key=lambda j: (j[3].startswith('T'), ))
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     rows = []
     with ProcessPoolExecutor(a.workers) as ex, open(a.out, "w", newline="") as f:
