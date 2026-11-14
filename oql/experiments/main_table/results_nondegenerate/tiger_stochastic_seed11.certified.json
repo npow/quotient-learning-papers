@@ -12,8 +12,8 @@
   ],
   "level_correction": "BONFERRONI",
   "command": "python experiments/main_table/run_nondegenerate.py --seeds 11 --out experiments/main_table/results_nondegenerate",
-  "commit": "91b5c02bc532bcfb998ffee176e67d60b287acef",
-  "python": "3.13.14",
+  "commit": "1698f7e5f8ddaa28ce2b0e3ae8a4a617013696b9-dirty",
+  "python": "3.13.15",
   "packages": {
     "numpy": "2.4.6",
     "scipy": "1.17.1"

@@ -6,27 +6,27 @@ Tiger (accuracy 0.85), memoryless stochastic policy listen/open-left/open-right 
 - recovery rate (partition == brute-force truth): 20/20
 - n_classes: mean 2.0 (expected 2)
 - abstention rate: mean 0.0000, max 0.0000
-- m* = 468, min inference count over seeds/contexts: 1556
+- m* = 468, min inference count over seeds/contexts: 1548
 
 | seed | n_classes | recovered | und. | min inf. count |
 |---|---|---|---|---|
-| 0 | 2 | True | 0.0 | 1588 |
-| 1 | 2 | True | 0.0 | 1587 |
-| 2 | 2 | True | 0.0 | 1591 |
-| 3 | 2 | True | 0.0 | 1590 |
-| 4 | 2 | True | 0.0 | 1589 |
-| 5 | 2 | True | 0.0 | 1569 |
+| 0 | 2 | True | 0.0 | 1572 |
+| 1 | 2 | True | 0.0 | 1586 |
+| 2 | 2 | True | 0.0 | 1593 |
+| 3 | 2 | True | 0.0 | 1619 |
+| 4 | 2 | True | 0.0 | 1564 |
+| 5 | 2 | True | 0.0 | 1588 |
 | 6 | 2 | True | 0.0 | 1556 |
-| 7 | 2 | True | 0.0 | 1623 |
-| 8 | 2 | True | 0.0 | 1590 |
-| 9 | 2 | True | 0.0 | 1575 |
-| 10 | 2 | True | 0.0 | 1586 |
-| 11 | 2 | True | 0.0 | 1568 |
-| 12 | 2 | True | 0.0 | 1577 |
-| 13 | 2 | True | 0.0 | 1585 |
-| 14 | 2 | True | 0.0 | 1582 |
-| 15 | 2 | True | 0.0 | 1567 |
-| 16 | 2 | True | 0.0 | 1573 |
-| 17 | 2 | True | 0.0 | 1558 |
-| 18 | 2 | True | 0.0 | 1575 |
-| 19 | 2 | True | 0.0 | 1605 |
+| 7 | 2 | True | 0.0 | 1609 |
+| 8 | 2 | True | 0.0 | 1587 |
+| 9 | 2 | True | 0.0 | 1585 |
+| 10 | 2 | True | 0.0 | 1557 |
+| 11 | 2 | True | 0.0 | 1588 |
+| 12 | 2 | True | 0.0 | 1590 |
+| 13 | 2 | True | 0.0 | 1581 |
+| 14 | 2 | True | 0.0 | 1601 |
+| 15 | 2 | True | 0.0 | 1583 |
+| 16 | 2 | True | 0.0 | 1584 |
+| 17 | 2 | True | 0.0 | 1555 |
+| 18 | 2 | True | 0.0 | 1571 |
+| 19 | 2 | True | 0.0 | 1548 |

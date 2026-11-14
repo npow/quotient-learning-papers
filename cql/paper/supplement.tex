@@ -198,7 +198,7 @@ which is the mechanism behind Remark~4 of the main paper.
 \end{remark}
 
 % ============================================================
-\section{Proof of Proposition~1}
+\section{Proof of Proposition~1 (corrected)}
 \label{sec:proof-prop1}
 % ============================================================
 
@@ -208,51 +208,78 @@ CDF of $z$ (over trajectories and time steps) and $F_N$ its empirical
 counterpart.  Empirical edges are $\hat e_j=F_N^{-1}(j/B)$ and population edges
 $e_j=F^{-1}(j/B)$, $j=1,\dots,B-1$.
 
+\paragraph{Notation.}
+$F$ is atomless; population bin $j$ is $(e_{j-1},e_j]$ with $F(e_j)=j/B$ (so each
+has mass $1/B$).  A bin is \emph{pure} if $z$ falls in a single $I_i$ with
+probability one on it, and \emph{straddling} otherwise.
+
 \paragraph{Glivenko--Cantelli.}
 The $N$ trajectories are i.i.d.\ blocks of $T$ observations, so
 $F_N(x)=N^{-1}\sum_i G_i(x)$ with $G_i(x)=T^{-1}\sum_t\mathbf 1\{z^{(i)}_t\le x\}$
 i.i.d.\ in $i$; the class $\{x\mapsto G_i(x)\}$ is monotone and bounded, so
-$\sup_x|F_N(x)-F(x)|\to0$ almost surely.
+$\sup_x|F_N(x)-F(x)|\to0$ almost surely, and (DKW applied to the i.i.d.\
+$G_i$) $\sup_x|F_N(x)-F(x)|=O_P(N^{-1/2})$ for fixed $T$.
 
-\paragraph{Under (a) and (b).}
-Let $G_i=(\sup I_i,\inf I_{i+1})$ be the $i$-th gap; $F$ is constant on
-$\overline{G_i}$ at level $q_i=\sum_{j\le i}p_j$, and by (b) $q_i=j_i/B$ for an
-integer $j_i$.  Hence the population edge $e_{j_i}$ lies in $\overline{G_i}$ and
-every population bin is contained in a single $I_i$: all population bins are
-pure, $P_b=P_{c(b)}$, and $\Qstar_B$ is the class partition (each class has
-mass $p_i\ge1/B$ by (b), so each class owns at least one bin), i.e.\
-$|\Qstar_B|=n$.
+\paragraph{Part (i): under (a) only.}
+Let $G_i=(\sup I_i,\inf I_{i+1})$, $i<n$, be the gaps.  A bin intersecting two
+classes must contain a whole gap in its interior, and a gap lies in the interior
+of at most one bin, so there are at most $n-1$ straddling bins.  Pure bins of the
+same class share the law $P_i$.  Hence the number of distinct bin laws is at most
+$n$ (pure laws) $+\,(n-1)$ (straddling bins), and trivially at most $B$:
+$|\Qstar_B|\le\min\{B,2n-1\}$.  For the lower bound let $p_i\ge2/B$.  Class $i$
+occupies the interval of $F$-mass $[q_{i-1},q_i]$ of length $p_i\ge2/B$; the
+bins are the cells $[(j{-}1)/B,j/B]$ in $F$-mass, and any interval of length at
+least $2/B$ contains a complete cell, which is then a pure bin of class $i$.
+So $n$ distinct pure laws exist ($P_i\neq P_{i'}$ by assumption) and
+$|\Qstar_B|\ge n$.  The condition $p_i\ge2/B$ forces $B\ge2n$; if the classes are
+only known to satisfy $p_i\ge1/B$ (so $B\ge n$), a complete cell is guaranteed
+only when the class boundaries are cell-aligned, i.e.\ under~(b); without either
+condition a class of mass $<1/B$ can be spread over two straddling bins and the
+lower bound $n$ can fail.  For $B<n$ the bound $n\le|\Qstar_B|$ is impossible
+since $|\Qstar_B|\le B$; this is the counterexample to the statement of the
+earlier version (it assumed $n\le|\Qstar_B|$ with no condition on $B$).
 
-For the empirical edges, $F_N(\sup I_i)-q_i=O_P(N^{-1/2})$ ($T$ fixed), so
-the number of observations of class $i$ (resp.\ $i{+}1$) that fall on the wrong
-side of $\hat e_{j_i}$ is $O_P(T\sqrt N)$, while each bin holds $NT/B$
-observations.  Thus the foreign-class \emph{fraction} of every empirical bin is
-$O_P(B/\sqrt N)\to0$ (asymptotic purity), and by the mixture identity
-$\mmd(\lambda P+(1-\lambda)P',P)=(1-\lambda)\mmd(P,P')$ the MMD between an
-empirical bin law and its class law is $O_P(B/\sqrt N)$.
+\paragraph{Part (ii): under (a) and (b).}
+By (b) the level $q_i=F(\sup I_i)=j_i/B$ for an integer $j_i$, and $F$ is
+constant on $\overline{G_i}$ at level $q_i$, so the population edge
+$e_{j_i}=F^{-1}(j_i/B)$ lies in $\overline{G_i}$.  Hence every population bin is
+contained in one $I_i$: all bins are pure and $P_b=P_{c(b)}$.  The class masses
+are $p_i=q_i-q_{i-1}$, positive multiples of $1/B$, so $p_i\ge1/B$ (and
+$n/B\le\sum_ip_i=1$ gives $B\ge n$); every class owns at least one bin and
+$\Qstar_B$ is the class partition with $|\Qstar_B|=n$.
 
-Now run variant~(T) with level $\alpha_N\to0$, $\log(1/\alpha_N)/m_N\to0$,
-where $m_N=\Theta(N)$ is the per-bin sample size (no cap).  The null threshold
-is $t_{\alpha_N}=\sqrt{2\kappa^2/m_N}(1+\sqrt{2\log(1/\alpha_N)})$, so
-$\sqrt{m_N}\,t_{\alpha_N}\to\infty$ while
-$\sqrt{m_N}\cdot O_P(B/\sqrt N)=O_P(1)$: same-class pairs have
-$\widehat{\mmd}\le O_P(1/\sqrt{m_N})+O_P(B/\sqrt N)<t_{\alpha_N}$ eventually,
-so they are merged, with probability $\to1$.  Cross-class pairs have a fixed
-gap $\varepsilon>0$ while $t_{\alpha_N}\to0$, so by Fact~\ref{fact:dev} they
-are split with probability $\to1$.  A union bound over the finitely many
-pairs gives $\Pr[\hat\calQ_B=\Qstar_B]\to1$.
+\paragraph{Part (iii): empirical bins, what is and is not proved.}
+The empirical edges are $\hat e_j=F_N^{-1}(j/B)$.  For the boundary $i$,
+$F_N(\sup I_i)-q_i=O_P(N^{-1/2})$.  The empirical edge $\hat e_{j_i}$ falls in the
+gap only if $F_N(\sup I_i)$ equals $j_i/B$ exactly; otherwise it falls inside
+$I_i$ or $I_{i+1}$ and the number of observations of the neighbouring class
+on the wrong side is $O_P(T\sqrt N)$.  Each bin holds $NT/B$ observations, so the
+foreign-class \emph{fraction} of every empirical bin is $O_P(B/\sqrt N)$: this
+\emph{tends to zero} but is, in general, non-zero at every finite $N$
+(equality $F_N(\sup I_i)=j_i/B$ is a lattice event whose probability does not
+approach one).  We therefore do \emph{not} claim exact purity of empirical bins,
+and the earlier statement that ``with probability $\to1$ every non-empty bin is
+pure'' is not established by this argument and is withdrawn.  By the mixture
+identity $\mmd(\lambda P+(1-\lambda)P',P)=(1-\lambda)\mmd(P,P')$ the MMD between
+an empirical bin's law and its class law is $O_P(B/\sqrt N)$.
 
-\paragraph{Under (a) alone.}
-Population edges that are not in a gap fall inside some $I_i$; a bin that
-contains a gap $G_i$ in its interior (no edge in $\overline{G_i}$) is a
-\emph{straddling} bin.  There are $n-1$ gaps, so at most $n-1$ straddling
-bins.  A straddling bin's law is $\sum_j\lambda_jP_j$ over the classes it
-intersects with all $\lambda_j\in(0,1)$; for two consecutive classes,
-$\mmd(\lambda P_i+(1-\lambda)P_{i+1},P_i)=(1-\lambda)\mmd(P_i,P_{i+1})>0$, so
-it is distinct from every pure law and contributes at most one extra class.
-If every class has mass at least $2/B$, every class also owns a pure bin, and
-$n\le|\Qstar_B|\le2n-1$.  The recovery argument above applies verbatim to
-$\Qstar_B$ (the straddling bins' mixture weights are $N$-independent).
+Run variant~(T) with i.i.d.\ per-bin sample size $m_N=\Theta(N)$ and level
+$\alpha_N\to0$, $\log(1/\alpha_N)/m_N\to0$.  The null threshold is
+$t_{\alpha_N}=\sqrt{2\kappa^2/m_N}\,(1+\sqrt{2\log(1/\alpha_N)})$, so
+$\sqrt{m_N}\,t_{\alpha_N}\to\infty$ while the contamination contributes
+$\sqrt{m_N}\cdot O_P(B/\sqrt N)=O_P(1)$.  Same-class pairs have
+$\widehat{\mmd}\le O_P(m_N^{-1/2})+O_P(B/\sqrt N)<t_{\alpha_N}$ eventually and are
+merged; cross-class pairs have a gap $\varepsilon-O_P(B/\sqrt N)\to\varepsilon>0$
+while $t_{\alpha_N}\to0$, so by Fact~\ref{fact:dev} they are split with
+probability $\to1$.  A union bound over the finitely many pairs gives
+$\Pr[\hat\calQ_B=\Qstar_B]\to1$ (as a partition of bin indices).  This is the
+precise sense of the recovery claim: \emph{vanishing contamination below the
+detection threshold}, not purity.
+
+\paragraph{Under (a) alone, estimation.}
+If class masses satisfy $p_i\ge2/B$, the lower bound of part~(i) holds, the
+straddling bins' mixture weights are $N$-independent, and the recovery argument
+above applies verbatim to $\Qstar_B$ with $|\Qstar_B|\in[n,2n-1]$.
 
 \paragraph{Without (a): unbounded noise.}
 If the class-conditional laws of $z$ have overlapping supports (e.g.\ Gaussian
@@ -364,15 +391,78 @@ Chain: agent $i$ classifies $s$ by the nearest mean, i.e.\ intervals with edges
 $(2s+1)/8$; $\Pr(Q_i=j\mid s)=\Phi((\text{hi}_j-s/4)/\sigma_i)-\Phi((\text{lo}_j-s/4)/\sigma_i)$;
 joint over uniform $s$; values $\sigma_B=0.1,0.2,0.5,1.0\mapsto1.0584,1.4462,1.8576,1.9642$ bits.
 
-\subsection{Baselines (\texttt{baselines/})}
-G-test: quantile discretisation of the (scalar) observation into 3 or 8
-symbols, then the finite-alphabet estimator of the companion paper
-($\alpha=0.01$).  Wasserstein-$\varepsilon$: same continuation matrices,
-$W_1$ between first-coordinate projections, merge iff $W_1<\varepsilon$.  DBC:
-MLP encoder trained on $(d_{\rm embed}(h_1,h_2)-W_1(P_{h_1},P_{h_2}))^2$,
-$k$-means with silhouette selection of $k$.  Result files:
-\path{ablation_sample_efficiency.csv},
-\path{bisim_comparison.csv} and \path{dbc_comparison.csv}.
+\subsection{Baselines (\texttt{experiments/revision/baselines\_lib.py})}
+\label{sec:baseline-details}
+All baselines see the same trajectories as the quotient estimator, are scored by
+the adjusted Rand index against the latent state, and none uses $n$ (except the
+``$B=n$'' reference rows).  They are our re-implementations of the cited
+estimators in the same one-observation-past setting, not the authors' code.
+\begin{itemize}\small
+\item \textbf{$W_1$ (multivariate).}  Bin-conditional continuation vectors
+  ($d_c=3$: $o_{t+1},a_{t+1},o_{t+2}$, raw units), at most 300 per bin; exact
+  Wasserstein-1 between equal-size subsamples via optimal assignment under the
+  Euclidean cost.  Bins are merged if $W_1<\varepsilon$ with
+  $\varepsilon\in\{0.1,0.2,0.5,1.0\}$ (single linkage, as for the quotient
+  estimator), or parameter-free by average-linkage clustering of the $W_1$
+  matrix with the number of clusters chosen by silhouette.
+\item \textbf{Ferns bisimulation metric.}  The finite-MDP metric of
+  \citet{Ferns2004} (the continuous-space metric of \citet{Ferns2011} cannot be
+  computed from samples without an abstraction), on the empirical chain over the
+  $B$ quantile bins: $d_{n+1}(s,t)=\max_a[(1-c)|r(s,a)-r(t,a)|+c\,W_1(P(\cdot|s,a),P(\cdot|t,a);d_n)]$,
+  $c=0.9$, exact LP for $W_1$, fixed point by iteration (tolerance $10^{-6}$,
+  at most 40 sweeps), rewards rescaled to $[0,1]$.  Bins are clustered by
+  average linkage with silhouette selection of the number of clusters.
+\item \textbf{DBC.}  The objective of \citet{Zhang2020} without the RL learner:
+  MLP encoder ($1\to64\to64\to8$), Gaussian latent dynamics model
+  $\hat P(z'|z,a)$ trained by negative log-likelihood on stop-gradient encoded
+  next observations, and the loss
+  $(\|z_i-z_j\|_1-|r_i-r_j|-\gamma W_2(\hat P(\cdot|\bar z_i,a_i),\hat P(\cdot|\bar z_j,a_j)))^2$
+  on random pairs within a batch of 256, $\gamma=0.99$, 3000 Adam steps.  Classes:
+  $k$-means on the embedding of every step with $k\in[2,12]$ by silhouette.
+\item \textbf{Reward for DBC and the Ferns metric.}  Bisimulation is
+  reward-defined.  Tiger uses its native reward; the K-cycle and GaussMix
+  environments are reward-free, so we use the next observation $o_{t+1}$ as an
+  emission reward.  Both are rescaled to $[0,1]$ (DBC, Ferns) --- this is our
+  choice and affects those baselines.
+\item \textbf{Causal-state learning.}  Following \citet{Zhang2019causal}: a GRU
+  (hidden size 32) reads $(o_{\le t},a_{<t})$, a head predicts $o_{t+1}$ (and the
+  reward on Tiger) from $(h_t,a_t)$ by mean squared error (30 epochs, Adam,
+  batch 128 trajectories); the hidden states are discretised by $k$-means with
+  $k\in[2,12]$ by silhouette (one of the two discretisers described in their
+  Sec.~4.2).  It conditions on the full history, unlike the other methods.
+\item \textbf{RKHS $\varepsilon$-machine.}  Following \citet{Brodu2022}, past
+  $=$ present observation, future $=$ the $k=2$ continuation vector, 1500
+  randomly drawn $(x,y)$ pairs, Gaussian kernels $\exp(-\|\cdot\|^2/\xi^2)$ with
+  $\xi=$ median pairwise distance; weights $\Omega=(G^X+\varepsilon I)^{-1}G^X$ with
+  $\varepsilon\in\{10^{-4},\dots,1\}$ by 3-fold cross-validation of the held-out
+  embedding error; $G^S=\Omega^\top G^Y\Omega$; diffusion-map coordinates
+  (density-normalised, row-stochastic, spectral-gap truncation); clustering by
+  DBSCAN with $\varepsilon_{\rm DB}=0.1\times$ the range of the leading
+  coordinate (their DBSCAN with threshold $0.1$ is on unnormalised coordinates;
+  our rescaling is a choice) or by $k$-means with silhouette.
+\item \textbf{Legacy baselines.}  The first-coordinate-projection Wasserstein and
+  the custom Wasserstein-matching DBC objective of the previous version
+  (\path{bisim_comparison.csv}, \path{dbc_comparison.csv}) are superseded and
+  no longer used; the G-test rows come from \path{ablation_sample_efficiency.csv}.
+\end{itemize}
+
+\subsection{Revision experiments (variant (T), partition accuracy)}
+Data: the same generators and settings as Section~\ref{sec:envs} (Tiger
+$N{=}3000$, $T{=}20$, $\alpha{=}0.01$, $R{=}199$; K-cycle $N{=}3000$, $T{=}50$,
+$\alpha{=}0.01$, $R{=}199$; GaussMix $N{=}2000$, $T{=}50$, $\alpha{=}0.05$,
+$R{=}99$), random policy, with the latent state recorded for scoring (the
+action space is seeded here; the original runs sampled actions from an unseeded
+action-space generator, so individual draws differ from the earlier result
+files).  Seeds $0$--$4$.  Procedure~(P): the package estimator unchanged.
+Variant~(T) and (P$^{\rm fix}$): \texttt{continuous\_quotient/variant\_t.py},
+$\delta=0.05$ for (T), $\alpha$ and $R$ as for (P) for (P$^{\rm fix}$), design
+fraction $0.5$, minimum $20$ samples per side, \texttt{per\_bin} sampling
+except Dec-Tiger (\texttt{per\_traj}).  ARI is computed over all steps with a
+full 2-step continuation whose bin is active.  Result files:
+\path{partition_accuracy.csv} (merged from \path{partition_accuracy_part1.csv},
+\path{_part2.csv}, \path{_part3.csv} by \path{summarize.py}),
+\path{partition_baselines.csv}, \path{tiger_T_scaling.csv},
+\path{dec_tiger_variant_t.csv}.
 
 % ============================================================
 \section{Additional Results}
@@ -395,7 +485,11 @@ $k$-means with silhouette selection of $k$.  Result files:
 
 Silhouette measures cluster quality in \emph{observation} space and is a
 heuristic proxy for the number of latent classes; it under-estimates $B$ when
-classes share observation marginals.  Results: GaussMix---$B=N_s$ on all 20
+classes share observation marginals.  Results (this revision,
+\path{partition_accuracy.csv}): silhouette selects $B=2$ on Tiger, $B=K$ for K-cycle
+$K\in\{2,3\}$ but $B=2$ for $K\in\{4,5,8\}$ (5 seeds each), and $B=N_s$ on GaussMix.
+(The previous version's claim of $B=K$ on K-cycle had no result file.)  Earlier
+GaussMix results---$B=N_s$ on all 20
 runs, and the auto-$B$ estimate equals the manual one on every run
 (\texttt{gaussian\_mixture.csv}); PO-HalfCheetah (passive)---$B=3$ on all 3
 seeds with $\hat n=3,3,2$ (\texttt{halfcheetah\_autobin.csv}).
@@ -538,7 +632,13 @@ The code ships a GRU/InfoNCE history encoder
 are reported in this paper because no result files were produced.
 
 \subsection{PO-HalfCheetah class statistics and value prediction}
-Tables~\ref{tab:halfcheetah_class_returns}--\ref{tab:sinval} follow.
+Tables~\ref{tab:halfcheetah_class_returns}--\ref{tab:sinval} follow.  Their $R^2$ values
+are \emph{in-sample} fits on all time steps; the held-out, trajectory-level
+analysis against a nonlinear speed baseline is in Table~\ref{tab:hcsplit} of the
+main paper (\path{halfcheetah_groupsplit_value.csv},
+\path{halfcheetah_groupsplit_value.py}) and supersedes the interpretation
+``classes carry multi-step information beyond speed'', which these in-sample
+linear comparisons do not support.
 
 \input{halfcheetah_class_returns}
 \input{halfcheetah_value_prediction}
@@ -560,6 +660,70 @@ Velocity $\ell_2$ (oracle) & 0.082 & 1.492 \\
   \texttt{halfcheetah\_sinusoidal\_value.csv}).}
 \label{tab:sinval}
 \end{table}
+% ============================================================
+\section{Artifacts, result files and corrections}
+\label{sec:artifacts}
+% ============================================================
+
+Code, scripts and result files are in the public repository
+\url{https://github.com/npow/quotient-learning-papers}, directory \texttt{cql/};
+the artifacts cited here are at tag \texttt{v1}.  All paths below are relative to
+\texttt{cql/}.
+
+\paragraph{Result files (every number in the paper comes from one of these).}
+\begin{itemize}\small
+\item Layer 1 (\path{experiments/layer1_ground_truth/results/}):
+  \path{tiger_continuous.csv}, \path{kcycle_continuous.csv},
+  \path{gaussian_mixture.csv}, \path{kcycle_bins_sensitivity.csv},
+  \path{tiger_N_sensitivity.csv}.
+\item Layer 2 (\path{experiments/layer2_mujoco/results/}):
+  \path{halfcheetah_continuous.csv}, \path{halfcheetah_sinusoidal.csv},
+  \path{ant_continuous.csv}, \path{halfcheetah_autobin.csv},
+  \path{halfcheetah_class_returns.csv}, \path{halfcheetah_value_prediction.csv},
+  \path{halfcheetah_sinusoidal_value.csv} (in-sample, superseded),
+  \path{halfcheetah_groupsplit_value.csv} (trajectory-level held-out split).
+\item Layer 3 (\path{experiments/layer3_rcrit/results/}):
+  \path{dec_tiger_rcrit.csv}, \path{dec_tiger_asymmetric.csv},
+  \path{dec_tiger_sym_alpha001_R999.csv}, \path{dec_tiger_asym_alpha001_R999.csv},
+  \path{chain_rcrit.csv}, \path{rcrit_sweep.csv}.
+\item Legacy baselines (\path{experiments/baselines/results/}):
+  \path{ablation_sample_efficiency.csv} (G-test rows only are still used);
+  \path{bisim_comparison.csv} and \path{dbc_comparison.csv} are the
+  first-coordinate Wasserstein and the custom DBC objective of the previous
+  version and are \emph{superseded} (not used in any table of this version).
+\item Revision (\path{experiments/revision/results/}):
+  \path{partition_accuracy.csv} (procedures P, P$^{\rm fix}$, T; ARI),
+  \path{partition_baselines.csv} (W1, Ferns metric, DBC, causal-state, RKHS
+  $\varepsilon$-machine; ARI), \path{dec_tiger_variant_t.csv},
+  \path{gaussmix_alpha_check.csv}.
+\end{itemize}
+Scripts: \path{experiments/revision/run_partition_accuracy.py},
+\path{run_partition_baselines.py}, \path{baselines_lib.py},
+\path{run_dec_tiger_variant_t.py}, \path{check_gaussmix_alpha.py},
+\path{experiments/layer2_mujoco/halfcheetah_groupsplit_value.py}; package code
+\path{continuous_quotient/variant_t.py}; tests under \path{tests/}.
+
+\paragraph{Corrections to the previous version.}
+\begin{itemize}\small
+\item \emph{Table~\ref{tab:sensitivity}, Tiger at $N=10000$.}  The entry
+  ``$2,2,2,2,20$'' was a typo.  \path{tiger_N_sensitivity.csv} contains
+  $\hat n=2$ on all five seeds at $N=10000$ (and $B=8$ makes $\hat n=20$
+  impossible); the table now reads $2,2,2,2,2$, in agreement with
+  Section~\ref{sec:ablations}.
+\item \emph{GaussMix $\alpha$.}  The shipped CSV has no $\alpha$ column.  The
+  script default is $\alpha=0.05$, Appendix~\ref{sec:envs} said $0.05$ and
+  Section~5 said $0.01$.  We re-ran the manual-$B$ configuration ($B=N_s$, $R=99$,
+  $N=2000$, seeds 0--2, \path{gaussmix_alpha_check.csv}) at both levels: $\hat n=N_s$
+  on all 12 runs at $\alpha=0.05$ and at $\alpha=0.01$, so the result file cannot
+  discriminate between the two settings and the reported numbers are unaffected.
+  The paper now states $\alpha=0.05$, $R=99$ throughout.
+\item \emph{Missing result-file names} in Appendices~C--D are filled in above.
+\item \emph{Pow 2026 / companion paper} is unpublished; nothing in this paper's
+  claims relies on it beyond the definition of the finite-alphabet baseline,
+  and its G-test rows in Table~\ref{tab:ablation} come from
+  \path{ablation_sample_efficiency.csv}.
+\end{itemize}
+
 \clearpage
 
 % ============================================================

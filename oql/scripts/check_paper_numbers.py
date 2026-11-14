@@ -119,6 +119,91 @@ def render() -> str:
     return "\n".join(lines)
 
 
+PART_CSV = (ROOT / "experiments" / "main_table" / "results_partitions"
+            / "partitions_per_seed.csv")
+PART_LABELS = {
+    "tiger": "Tiger (always listen)",
+    "kcycle_8": "noisy 8-cycle",
+    "noisy_depth2": "noisy depth-2 (merge)",
+    "position_flip": "position-flip chain",
+    "position_flip_multi": "position-flip, two endpoints",
+    "noisy_depth2_nested_L2": "noisy depth-2, nested $L=2$",
+    "tiger_stochastic": "Tiger, stochastic policy",
+    "posthoc_hmm": "random HMM (data-driven $\\eps$)",
+    "misspec_chain": "misspecification probe $\\dagger$",
+}
+PART_SEEDS = {
+    "tiger": 20, "kcycle_8": 20, "noisy_depth2": 20, "position_flip": 10,
+    "position_flip_multi": 10, "noisy_depth2_nested_L2": 20,
+    "tiger_stochastic": 20, "posthoc_hmm": 20, "misspec_chain": 10,
+}
+
+
+def _tex_partition(text: str) -> str:
+    blocks = [b.strip() for b in text.split("|")]
+    return " $\\mid$ ".join(blocks)
+
+
+def render_partitions() -> str:
+    with PART_CSV.open(newline="") as f:
+        rows = list(csv.DictReader(f))
+    lines = []
+    keys: list[tuple[str, str]] = []
+    for r in rows:
+        k = (r["experiment"], r["endpoint_r"])
+        if k not in keys:
+            keys.append(k)
+    if {k[0] for k in keys} != set(PART_LABELS):
+        raise SystemExit(f"partition experiments mismatch: {sorted({k[0] for k in keys})}")
+    for exp, r_ in sorted(keys, key=lambda k: (list(PART_LABELS).index(k[0]), k[1])):
+        sub = [x for x in rows if x["experiment"] == exp and x["endpoint_r"] == r_]
+        if len(sub) != PART_SEEDS[exp]:
+            raise SystemExit(f"{exp} r={r_}: {len(sub)} seeds != {PART_SEEDS[exp]}")
+        bad = [x for x in sub if x["count_matches_committed"] == "0"]
+        if bad:
+            raise SystemExit(f"{exp}: re-run class count differs from committed CSV")
+        parts = {x["partition_reported"] for x in sub}
+        if len(parts) != 1:
+            raise SystemExit(f"{exp} r={r_}: partitions differ across seeds ({len(parts)}); "
+                             "the table caption assumes identical partitions")
+        exact = sum(int(x["exact_match"]) for x in sub)
+        worst = max(int(x["pair_error"]) for x in sub)
+        npairs = {int(x["n_pairs"]) for x in sub}.pop()
+        lines.append(
+            f"    {PART_LABELS[exp]} & {r_} & {len(sub)} & {exact}/{len(sub)} "
+            f"& {worst}/{npairs} & {_tex_partition(parts.pop())}\\\\"
+        )
+    return "\n".join(lines)
+
+
+def check_block(tex: str, name: str, expected: str, fix: bool) -> tuple[str, int]:
+    pattern = re.compile(
+        rf"(% BEGIN AUTOGEN: {name}\n)(.*?)(% END AUTOGEN: {name})", re.DOTALL)
+    m = pattern.search(tex)
+    if not m:
+        print(f"missing {name} AUTOGEN block", file=sys.stderr)
+        return tex, 1
+    expected += "\n"
+    if m.group(2) == expected:
+        print(f"{name} block: OK")
+        return tex, 0
+    if fix:
+        print(f"fixed {name} block")
+        return pattern.sub(lambda mm: mm.group(1) + expected + mm.group(3),
+                           tex, count=1), 0
+    print(f"{name} block differs from artifacts:\n--- paper ---\n{m.group(2)}"
+          f"--- artifacts ---\n{expected}", file=sys.stderr)
+    return tex, 1
+
+
+def main_partitions(fix: bool) -> int:
+    tex = TEX.read_text()
+    tex, rc = check_block(tex, "partitions", render_partitions(), fix)
+    if fix:
+        TEX.write_text(tex)
+    return rc
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fix", action="store_true")
@@ -136,14 +221,14 @@ def main(argv: list[str] | None = None) -> int:
     expected = render() + "\n"
     if match.group(2) == expected:
         print("independent_smoke block: OK")
-        return 0
+        return main_partitions(args.fix)
     if args.fix:
         tex = pattern.sub(
             lambda m: m.group(1) + expected + m.group(3), tex, count=1
         )
         TEX.write_text(tex)
         print("fixed independent_smoke block")
-        return 0
+        return main_partitions(True)
     print(
         "independent_smoke block differs from artifacts:\n"
         f"--- paper ---\n{match.group(2)}--- artifacts ---\n{expected}",

@@ -77,13 +77,18 @@ def collect_trajectories(
     """Roll out `n_episodes` independent episodes and return an immutable
     TrajectoryDataset.
 
-    The RNG used for action sampling and for the environment reset is seeded
-    deterministically per episode (seed + ep_idx) for reproducibility.
+    The environment is reset with a per-episode seed derived from (seed, ep_idx);
+    the policy draws from a separate generator seeded by (that seed, 1), so
+    action randomness is independent of environment noise.
     """
     trajectories: list[Trajectory] = []
     for ep in range(n_episodes):
         ep_seed = int(seed) * 100003 + ep
-        rng = np.random.default_rng(ep_seed)
+        # The policy's generator must be independent of the environment's
+        # (which env.reset(seed=ep_seed) seeds with ep_seed itself); sharing
+        # the seed couples action draws to latent/observation noise and
+        # silently changes the closed-loop law for stochastic policies.
+        rng = np.random.default_rng([ep_seed, 1])
         obs = env.reset(seed=ep_seed)
         observations: list[int] = [int(obs)]
         actions: list[int] = []

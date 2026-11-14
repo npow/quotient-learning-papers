@@ -10,6 +10,6 @@ Model & Features & $R^2$ & MAE \\
   Velocity $\ell_2$ (oracle) & 1 & 0.066 & 0.084 \\
 \bottomrule
 \end{tabular}
-\caption{Class-conditioned value prediction on PO-HalfCheetah (zero-action policy, $\gamma=0.99$, $n=51,000$ timesteps). The auto-selected $B=3$ quotient partition explains $1.0\%$ of return variance (linear $R^2$) and $\eta^2=0.010$ of total variance (ANOVA effect size). Kruskal-Wallis test rejects equal-return distributions across classes ($p=4.92e-117$), confirming classes capture genuine momentum-dependent behavioral structure. The continuous velocity oracle achieves $R^2=0.066$; the class predictor captures $16\%$ of the oracle's signal with only 3 discrete bins.}
+\caption{Class-conditioned value prediction on PO-HalfCheetah (zero-action policy, $\gamma=0.99$, $n=51,000$ timesteps). The auto-selected $B=3$ quotient partition explains $1.0\%$ of return variance (linear $R^2$) and $\eta^2=0.010$ of total variance (ANOVA effect size). The Kruskal-Wallis $p$-value ($4.92\times10^{-117}$) treats time steps as independent and is not evidence of a trajectory-level effect.  All $R^2$ values here are in-sample; see Table~\ref{tab:hcsplit} for the held-out, trajectory-level comparison against a nonlinear speed baseline, which shows the classes carry no information beyond speed.}
 \label{tab:halfcheetah_value_prediction}
 \end{table}

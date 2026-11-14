@@ -15,6 +15,10 @@ from quotient_learning.types import ObservationHistory
 
 class TestTigerL2Regression:
     def test_no_confident_wrong_partition_at_l2(self):
+        # Always-listen policy and epsilon_min below the listen gap: with the
+        # uniform-random policy door openings dilute the continuation gap
+        # below epsilon_min/2, so merging would then be the correct verdict
+        # (the policy RNG is independent of the environment's).
         env = TigerPOMDP(seed=7)
         est = QuotientEstimator(
             env=env,
@@ -23,8 +27,10 @@ class TestTigerL2Regression:
             history_max_length=2,
             min_history_occurrences=30,
             alpha=0.05,
-            epsilon_min=0.5,
+            epsilon_min=0.45,
             power_beta=0.05,
+            policy=lambda _obs, _rng: 0,
+            policy_id="always_listen",
         )
         q = est.run(seed=7)
 

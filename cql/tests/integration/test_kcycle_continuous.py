@@ -29,7 +29,8 @@ def test_kcycle_recovers_k_classes(K: int):
         history_max_length=1,
         min_history_occurrences=20,
         alpha=0.01,
-        n_permutations=99,
+        n_permutations=199,
+        history_n_bins=K,   # aligned resolution B=K (paper Table 1); the package default B=8 over-splits (Table 2)
     )
     estimator = ContinuousQuotientEstimator(config)
     correct = 0

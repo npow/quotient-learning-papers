@@ -1,0 +1,35 @@
+{
+  "p_listen": 0.8,
+  "listen_accuracy": 0.85,
+  "closed_form": {
+    "P(O2=L|O1=L)": 0.696,
+    "P(O2=L|O1=R)": 0.30400000000000005,
+    "tv": 0.3919999999999999,
+    "reach_prob": 0.8,
+    "context_mass": 0.4
+  },
+  "brute_force_enumeration": {
+    "tv": 0.392,
+    "masses": {
+      "(0,)": 0.4,
+      "(1,)": 0.4
+    }
+  },
+  "monte_carlo": {
+    "n_episodes": 400000,
+    "reach_fraction": 0.800605,
+    "contexts": {
+      "0": {
+        "n": 160315,
+        "mass": 0.4007875,
+        "p_next_left": 0.6978635810747591
+      },
+      "1": {
+        "n": 159927,
+        "mass": 0.3998175,
+        "p_next_left": 0.30465775009848245
+      }
+    },
+    "tv": 0.39320583097627665
+  }
+}
