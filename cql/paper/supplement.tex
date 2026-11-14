@@ -167,7 +167,7 @@ the probability that \emph{some} pair is decided wrongly is at most
 $|\calP|(\alpha_0+\delta')\le(\Khist^2/2)(2\delta/\Khist^2)=\delta$.  On the
 complementary event every same-class pair (in $\Qstar_B$) is merged and no
 cross-class pair is merged, so the connected components of the union--find
-graph are exactly the classes of $\Qstar_B$, i.e.\ $\hat\calQ_B=\Qstar_B$.
+graph are exactly the classes of $\Qstar_B$, i.e.\ $\widehat{\calQ}_B=\Qstar_B$.
 
 \emph{Trajectory budget (variant (T), \texttt{per\_traj}).}  Condition on the
 design half, which fixes the edges, the bandwidth, the active bins $\calB$,
@@ -198,7 +198,7 @@ $e^{-N\pi_{\min}/40}\le e^{-8}\delta^2/(2\Khist^4)$.  A union bound over at most
 $\Khist^2/2$ pairs and 2 sides gives $\Pr[\mathcal E^c]\le\Khist^2
 e^{-N\pi_{\min}/40}\le e^{-8}\delta^2/(2\Khist^2)\le\delta$.  Together with the
 pair-decision failure probability $\le\delta$ (which holds conditionally on the
-counts on $\mathcal E$), $\Pr[\hat\calQ_B\ne\Qstar_B]\le2\delta$.
+counts on $\mathcal E$), $\Pr[\widehat{\calQ}_B\ne\Qstar_B]\le2\delta$.
 
 \emph{Quantile edges.}  For $\ell=1$ the design half fits $\hat e_j=F_{N_d}^{-1}(j/B)$ with $N_d=\lfloor
 N/2\rfloor$.  By the DKW argument of Section~B (applied to the i.i.d.\ blocks
@@ -221,7 +221,10 @@ sample cap $m_{\max}=300$ used in the experiments this guarantees detection
 only for $\epsMMD\gtrsim1.15$; the permutation test is far less conservative
 than the analytic threshold in practice, but the calculation shows that
 distinctions with small MMD gaps are \emph{not} resolved at $m_{\max}=300$,
-which is the mechanism behind Remark~4 of the main paper.
+which is the mechanism behind Remark~4 of the main paper.  This calculation
+applies to procedure~(P) and to any sampler that caps each side at
+$m_{\max}$; the \texttt{per\_traj} variant of Theorem~1 is uncapped, and its
+sample budget is the one derived in the proof above.
 \end{remark}
 
 % ============================================================
@@ -299,7 +302,7 @@ $\widehat{\mmd}\le O_P(m_N^{-1/2})+O_P(B/\sqrt N)<t_{\alpha_N}$ eventually and a
 merged; cross-class pairs have a gap $\varepsilon-O_P(B/\sqrt N)\to\varepsilon>0$
 while $t_{\alpha_N}\to0$, so by Fact~\ref{fact:dev} they are split with
 probability $\to1$.  A union bound over the finitely many pairs gives
-$\Pr[\hat\calQ_B=\Qstar_B]\to1$ (as a partition of bin indices).  This is the
+$\Pr[\widehat{\calQ}_B=\Qstar_B]\to1$ (as a partition of bin indices).  This is the
 precise sense of the recovery claim: \emph{vanishing contamination below the
 detection threshold}, not purity.
 
@@ -491,7 +494,10 @@ full 2-step continuation whose bin is active.  Result files:
 \path{partition_accuracy.csv} (merged from \path{partition_accuracy_part1.csv},
 \path{_part2.csv}, \path{_part3.csv} by \path{summarize.py}),
 \path{partition_baselines.csv}, \path{tiger_T_scaling.csv},
-\path{dec_tiger_variant_t.csv}.
+\path{dec_tiger_variant_t.csv}, and, added with the \texttt{per\_traj} analysis
+of this version, \path{partition_accuracy_pertraj.csv},
+\path{partition_accuracy_2n.csv}, \path{T_traj_scaling.csv},
+\path{tiger_T_scaling_pertraj.csv} and \path{dec_tiger_pfix_N20000_seeds3_9.csv}.
 
 % ============================================================
 \section{Additional Results}
@@ -732,8 +738,22 @@ and their scripts) are not in \texttt{v1}; they are in commit
   (T-pt); Tiger scaling in the text $\leftarrow$ \path{tiger_T_scaling_pertraj.csv};
   K-cycle/GaussMix scaling $\leftarrow$ \path{T_traj_scaling.csv}; Dec-Tiger
   (iv) $\leftarrow$ \path{dec_tiger_variant_t.csv} and
-  \path{dec_tiger_pfix_N20000_seeds3_9.csv}; Tables~\ref{tab:layer1}--\ref{tab:mujoco}
-  $\leftarrow$ the Layer 1--3 files above.
+  \path{dec_tiger_pfix_N20000_seeds3_9.csv}; Table~\ref{tab:layer1}
+  $\leftarrow$ \path{tiger_continuous.csv}, \path{kcycle_continuous.csv},
+  \path{gaussian_mixture.csv}; Table~\ref{tab:sensitivity} $\leftarrow$
+  \path{kcycle_bins_sensitivity.csv}, \path{tiger_N_sensitivity.csv};
+  Table~\ref{tab:ari} $\leftarrow$ \path{partition_accuracy.csv};
+  Table~\ref{tab:baselines} $\leftarrow$ \path{partition_baselines.csv}
+  (with \path{partition_accuracy.csv} for the (P) rows);
+  Table~\ref{tab:ablation} $\leftarrow$ \path{ablation_sample_efficiency.csv};
+  Table~\ref{tab:mujoco} $\leftarrow$ the Layer~2 files
+  \path{halfcheetah_continuous.csv}, \path{halfcheetah_sinusoidal.csv},
+  \path{ant_continuous.csv}, \path{halfcheetah_autobin.csv};
+  Table~\ref{tab:hcsplit} $\leftarrow$ \path{halfcheetah_groupsplit_value.csv};
+  the $R_{\rm crit}$ tables and figure $\leftarrow$ the Layer~3 files
+  (\path{dec_tiger_rcrit.csv}, \path{dec_tiger_asymmetric.csv},
+  \path{dec_tiger_sym_alpha001_R999.csv}, \path{dec_tiger_asym_alpha001_R999.csv},
+  \path{chain_rcrit.csv}, \path{rcrit_sweep.csv}).
 \item Revision (\path{experiments/revision/results/}):
   \path{partition_accuracy.csv} (procedures P, and T and P$^{\rm fix}$ with
   \texttt{per\_bin}; ARI), \path{partition_accuracy_pertraj.csv} (T and

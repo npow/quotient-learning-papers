@@ -375,7 +375,7 @@ over $h\in b$).
 
 \begin{definition}[Bin-level quotient]
 $\Qstar_B$ is the partition of $\calB$ induced by $b\sim b'\iff P_b=P_{b'}$.
-The estimator's target is $\Qstar_B$; we write $\hat\calQ_B$ for its output.
+The estimator's target is $\Qstar_B$; we write $\widehat{\calQ}_B$ for its output.
 \end{definition}
 
 $\Qstar_B$ is always finite.  It coincides with the latent class partition
@@ -418,7 +418,7 @@ under-splitting at small $m$ and over-splitting at large $m$ (Section~\ref{sec:t
 \subsection{Union--Find Quotient Estimator}
 
 Bins are merged whenever the test does \emph{not} reject; the resulting
-single-linkage partition is $\hat\calQ_B$.  Algorithm~\ref{alg:cqe} states the
+single-linkage partition is $\widehat{\calQ}_B$.  Algorithm~\ref{alg:cqe} states the
 procedure as implemented; we call it \textbf{procedure~(P)}.
 
 \paragraph{Variant (T) (the analysed procedure).}
@@ -466,7 +466,7 @@ that of the calibration.
 \Require Trajectories $\{(o^{(i)}_1,a^{(i)}_1,\dots,o^{(i)}_T)\}_{i=1}^N$,
          history length $\ell$, window $k$, bins $B$, minimum count $m_{\min}$,
          cap $m_{\max}$, level $\alpha$, permutations $R$.
-\Ensure  Partition $\hat\calQ_B$ of active keys.
+\Ensure  Partition $\widehat{\calQ}_B$ of active keys.
 \State \textbf{Quantile edges.}  Fit $B$ equal-frequency edges of $z(o)$ over all $(i,t)$.
 \State \textbf{Key histories.}  For each $(i,t)$ compute the key $b^{(i)}_t$ from the
        binned last $\ell$ observations (and discrete actions).
@@ -475,7 +475,7 @@ that of the calibration.
 \State \textbf{MMD tests.}  For each pair $b_1<b_2$: subsample at most $m_{\max}$ vectors per side,
        compute \eqref{eq:mmd} with the median-heuristic bandwidth and the permutation $p$-value.
 \State \textbf{Multiplicity.}  Apply BH at level $\alpha$ to all $p$-values; reject $=$ ``different''.
-\State \textbf{Union--find.}  Merge every non-rejected pair; \Return $\hat\calQ_B$.
+\State \textbf{Union--find.}  Merge every non-rejected pair; \Return $\widehat{\calQ}_B$.
 \end{algorithmic}
 \end{algorithm}
 
@@ -516,7 +516,7 @@ trajectories for the two sides.  If
   N\;\ge\;\frac{10\,m_\star}{\pi_{\min}},
   \label{eq:bound}
 \end{equation}
-then $\hat\calQ_B=\Qstar_B$ with probability at least $1-2\delta$.  If the bins
+then $\widehat{\calQ}_B=\Qstar_B$ with probability at least $1-2\delta$.  If the bins
 come from quantile edges, then $\pi_{\min}\ge1/(2B)$ with probability at least
 $1-\delta$ once $N\ge65B^2\log(2/\delta)$, so
 $N=O\!\big(B\log(B/\delta)/\epsMMD^2+B^2\log(1/\delta)\big)$ suffices for
@@ -582,14 +582,14 @@ per trajectory instead of one.  We did not extend the theorem to (P).  What can 
   Remark~\ref{rem:floor} explains why BH can reject everything when $R$ is small.
 \item \emph{Overlapping windows.}  Windows of one trajectory are dependent, so
   exchangeability fails; (P) is analysed under no mixing model.
-\item \emph{Power.}  The detection guarantee (eq.~\eqref{eq:m-bound}) is proved
+\item \emph{Power.}  The detection guarantee of Theorem~\ref{thm:main} is proved
   for the analytic threshold only.
 \end{itemize}
 Consequently, \textbf{all positive claims about (P) in Section~\ref{sec:experiments}
 are empirical}, and the guarantee of Theorem~\ref{thm:main} is empirically
 checked on the (T) runs of Section~\ref{sec:variantT}, where the analytic
 threshold is conservative: at the sample sizes of our main experiments it
-cannot resolve the Gaussian-noise classes (RESULT-T-SUMMARY).
+cannot resolve the Gaussian-noise classes: with the sampler the theorem covers, (T) returns $\hat n=1$ on Tiger and on every GaussMix run at $N\le3000$ (Tables~\ref{tab:variantT}--\ref{tab:variantT8}).
 
 \begin{remark}[Permutation floor and BH]
 \label{rem:floor}
