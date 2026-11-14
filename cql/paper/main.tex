@@ -73,52 +73,41 @@
 \begin{abstract}
 % ============================================================
 Model-free identification of the minimal world-model of a bounded agent in a
-partially observable Markov decision process (POMDP) has been made tractable in
-the \emph{finite} setting by Myhill--Nerode quotient learning: a permutation
-G-test on fixed-policy continuation histograms clusters histories into
-continuation-equivalence classes.  When observations and actions are
-continuous the continuation alphabet is infinite and the G-test is undefined.
+POMDP has been made tractable in the \emph{finite} setting by Myhill--Nerode
+quotient learning: a permutation G-test on fixed-policy continuation histograms
+clusters histories into continuation-equivalence classes. With continuous
+observations and actions the continuation alphabet is infinite and the G-test
+is undefined.
 
-We extend quotient learning to continuous observation--action spaces
-$\calO\times\calA\subseteq\bbR^d$.  Histories are keyed by coarse quantile
-bins of the observation stream and, for every pair of bins, the continuation
-laws are compared with a kernel maximum mean discrepancy (MMD) permutation test
-on raw continuation vectors under Benjamini--Hochberg control; bins whose test
-does not reject are merged by union--find.  We (i) identify the estimator's
-target precisely---the \emph{bin-level} continuation quotient---and give
-conditions under which it coincides with the latent quotient of index $n$;
-(ii) prove an alphabet-free trajectory bound
-$N=O\!\big(\Khist(\tau{+}k)\log(\Khist/\delta)/(T\epsMMD^2)\big)$, with
-$\Khist=O(n)$ active bins, in which the alphabet size $|\calC|$ of the finite
-bound is replaced by the MMD separation $\epsMMD$ (dimension enters only
-through $\epsMMD$); and (iii) characterise the finite-sample behaviour as a
+We extend quotient learning to $\calO\times\calA\subseteq\bbR^d$. Histories are
+keyed by coarse quantile bins; for every pair of bins the continuation laws are
+compared with a kernel maximum mean discrepancy (MMD) permutation test on raw
+continuation vectors under Benjamini--Hochberg control, and bins whose test does
+not reject are merged by union--find. We (i) identify the estimator's target---the
+\emph{bin-level} continuation quotient---and give conditions under which it
+coincides with the latent quotient of index $n$; (ii) prove an alphabet-free
+trajectory bound $N=O\!\big(\Khist(\tau{+}k)\log(\Khist/\delta)/(T\epsMMD^2)\big)$
+in which the alphabet size $|\calC|$ of the finite bound is replaced by the MMD
+separation $\epsMMD$; and (iii) characterise finite-sample behaviour as a
 \emph{resolution} effect: distinctions below the test's detection scale are
-merged, so the returned quotient size depends on the bin count $B$ and on the
-per-test sample budget.
+merged, so the returned size depends on the bin count $B$ and the sample budget.
 
-Empirically, the procedure we run (permutation test with BH, procedure~P) returns
-the latent index on 90/90 runs when $B$ is set equal to the latent index $n$
-across Tiger ($\sigma{=}0.5$), K-cycle ($K\le16$) and a Gaussian-mixture random
-walk, but this uses $n$: with $B$ chosen without $n$ (silhouette, or a fixed
-$B{=}8$) the adjusted Rand index against the latent state drops on K-cycle
-($K\ge4$) and the index is over-split, and no baseline we implement
-(RKHS $\varepsilon$-machine, GRU causal-state learning, a Ferns bisimulation
-metric, multivariate Wasserstein, DBC) is uniformly better or worse; a GRU
-causal-state baseline with full-history input is the strongest on K-cycle.
-The analysed variant (T) of Theorem~1 is conservative: at $N{=}3000$ it
-cannot resolve Tiger and merges classes at $B{=}8$, though it matches (P) at
-$B{=}n$ on K-cycle and most Gaussian-mixture runs and resolves Tiger from
-$N{=}10^4$.  We state precisely which guarantee covers which procedure.
-On PO-MuJoCo the estimator returns $\hat n{=}B$ (all bin pairs separable); a
-trajectory-level held-out analysis shows that the classes do \emph{not} carry
-information beyond a nonlinear function of speed.  On a 4-state chain
-Dec-POMDP the estimated critical communication rate
-$\hat R_{\rm crit}=H(\hat Q_A\mid\hat Q_B)$ tracks the analytical value within
-$0.8\%$ mean error whenever both agents' quotients are non-trivial; on
-Dec-Tiger the estimate is accurate on the seeds where agent A recovers two
-classes but agent-A over-splitting occurs on 5/10 seeds at $\alpha{=}0.05$.
-We report all seeds.  Code and result files: github.com/npow/quotient-learning-papers
-(\texttt{cql/}, tag \texttt{v1}).
+Empirically, the procedure we run (permutation test with BH; procedure P) returns
+the latent index on 90/90 runs when $B=n$ on Tiger, K-cycle ($K\le16$) and a
+Gaussian-mixture walk, but this uses $n$: with $B$ chosen without $n$ the
+adjusted Rand index drops on K-cycle ($K\ge4$) and the index is over-split. No
+baseline we implement (RKHS $\varepsilon$-machine, GRU causal-state learning,
+Ferns bisimulation metric, multivariate Wasserstein, DBC) is uniformly better or
+worse; the GRU is strongest on K-cycle. The analysed variant (T) of Theorem~1 is
+conservative: at $N{=}3000$ it merges Tiger's classes, resolving them from
+$N{=}10^4$. We state which guarantee covers which procedure. On PO-MuJoCo the
+estimator returns $\hat n{=}B$, and a trajectory-level held-out analysis shows the
+classes carry no information beyond a nonlinear function of speed. On a 4-state
+chain Dec-POMDP the estimated critical communication rate tracks the analytical
+value within $0.8\%$ mean error when both quotients are non-trivial; on Dec-Tiger
+agent A over-splits on 5/10 seeds at $\alpha{=}0.05$. We report all seeds. Code
+and results: github.com/npow/quotient-learning-papers (\texttt{cql/}, tag
+\texttt{v1}).
 \end{abstract}
 
 % ============================================================
