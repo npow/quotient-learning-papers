@@ -86,8 +86,8 @@ continuation vectors under Benjamini--Hochberg control, and bins whose test does
 not reject are merged by union--find. We (i) identify the estimator's target---the
 \emph{bin-level} continuation quotient---and give conditions under which it
 coincides with the latent quotient of index $n$; (ii) prove an alphabet-free
-trajectory bound $N=O\!\big(\Khist(\tau{+}k)\log(\Khist/\delta)/(T\epsMMD^2)\big)$
-in which the alphabet size $|\calC|$ of the finite bound is replaced by the MMD
+trajectory bound $N=O\!\big(B\log(B/\delta)/\epsMMD^2+B^2\log(1/\delta)\big)$
+for an analysed variant (T) with one window per trajectory, in which the alphabet size $|\calC|$ of the finite bound is replaced by the MMD
 separation $\epsMMD$; and (iii) characterise finite-sample behaviour as a
 \emph{resolution} effect: distinctions below the test's detection scale are
 merged, so the returned size depends on the bin count $B$ and the sample budget.
@@ -99,15 +99,16 @@ adjusted Rand index drops on K-cycle ($K\ge4$) and the index is over-split. No
 baseline we implement (RKHS $\varepsilon$-machine, GRU causal-state learning,
 Ferns bisimulation metric, multivariate Wasserstein, DBC) is uniformly better or
 worse; the GRU is strongest on K-cycle. The analysed variant (T) of Theorem~1 is
-conservative: at $N{=}3000$ it merges Tiger's classes, resolving them from
-$N{=}10^4$. We state which guarantee covers which procedure. On PO-MuJoCo the
+conservative: with the sampler its theorem covers (one window per trajectory) it merges
+Tiger's classes at $N{=}3000$, resolving them from $N{=}10^4$ at $B{=}2$, and merges
+all Gaussian-mixture classes at $N\le3000$. We state which guarantee covers which procedure. On PO-MuJoCo the
 estimator returns $\hat n{=}B$, and a trajectory-level held-out analysis shows the
 classes carry no information beyond a nonlinear function of speed. On a 4-state
 chain Dec-POMDP the estimated critical communication rate tracks the analytical
 value within $0.8\%$ mean error when both quotients are non-trivial; on Dec-Tiger
 agent A over-splits on 5/10 seeds at $\alpha{=}0.05$. We report all seeds. Code
 and results: github.com/npow/quotient-learning-papers (\texttt{cql/}, tag
-\texttt{v1}).
+\texttt{v1}, commit \texttt{83f9f42}; new result files in commit \texttt{2c16829}).
 \end{abstract}
 
 % ============================================================
@@ -148,10 +149,14 @@ states by diffusion-map coordinates and clustering; causal-state learning
 \citep{Zhang2019causal} approximates the same partition with recurrent
 predictors and discretisation; and bisimulation metrics \citep{Ferns2011}
 address brittleness of exact equivalence in continuous state spaces.  What
-those methods do not supply is a \emph{test-based} estimator with a stated
-finite-sample target and error control: they cluster point estimates with a
-user-set scale or threshold, and (to our knowledge) give no statement of the
-partition that is recovered at a given sample size.  Section~\ref{sec:related}
+those methods do not supply is an explicit \emph{finite-sample estimand} with an
+analysed sample bound: the RKHS $\varepsilon$-machine and causal-state
+learning cluster point estimates with a user-set scale or threshold, and
+(to our knowledge) none of the cited methods states the partition that is
+recovered at a given sample size or a trajectory bound for it.  Two-sample
+testing itself is \emph{not} new here: the RKHS $\varepsilon$-machine maps
+clustering to the MMD test, and Mixed LICORS \citep{Goerg2013} permits
+nonparametric two-sample tests of equality of predictive distributions.  Section~\ref{sec:related}
 and the head-to-head comparison in Section~\ref{sec:baselines} make the
 relationship precise.
 
@@ -160,8 +165,9 @@ We compare bin-conditional continuation laws with a kernel MMD permutation test
 on raw continuation vectors \citep{Gretton2012}, so no discretisation of the
 continuation space is needed, and key histories by coarse quantile bins so that
 enough continuations accumulate per key.  The contribution is a
-\emph{finite-sample, test-based formulation} of continuous quotient learning,
-not the idea of MMD-based predictive-state clustering.  Concretely:
+\emph{finite-sample formulation} of continuous quotient learning (an explicit
+estimand and an analysed sample bound for a pairwise-test estimator), not the
+idea of MMD- or test-based predictive-state clustering.  Concretely:
 \begin{enumerate}
 \item \textbf{Algorithm (Section~\ref{sec:method}).}  Quantile binning of the
   observation stream into $B$ bins, a biased-MMD$^2$ permutation test with a
@@ -179,13 +185,13 @@ not the idea of MMD-based predictive-state clustering.  Concretely:
 \item \textbf{Alphabet-free sample complexity (Section~\ref{sec:theory}).}
   Using the concentration of the biased MMD statistic
   \citep[Thm.~7, Cor.~9]{Gretton2012} we prove that
-  $N=O(\Khist(\tau{+}k)\log(\Khist/\delta)/(T\epsMMD^2))$ trajectories suffice
-  to recover $\Qstar_B$ with probability $1-\delta$, where $\Khist\le B^\ell$
-  is the number of active history bins ($\Khist=B=O(n)$ in all our
-  experiments).  The $|\calC|$ factor of the finite bound disappears; the
+  $N=O(B\log(B/\delta)/\epsMMD^2+B^2\log(1/\delta))$ trajectories suffice
+  to recover $\Qstar_B$ with probability $1-3\delta$ under the analysed
+  variant (one window per trajectory; $\ell=1$, quantile bins; $B=\Khist=O(n)$
+  in all our experiments).  The $|\calC|$ factor of the finite bound disappears; the
   dimension enters only through $\epsMMD$.  The theorem is about the
-  \emph{analysed variant}~(T) (fixed kernel and bins, i.i.d.\ samples, analytic
-  threshold), \emph{not} about the permutation/BH procedure used in most
+  \emph{analysed variant}~(T) (fixed kernel and bins, one window per trajectory sampling
+  the exact pooled bin law, analytic threshold), \emph{not} about the permutation/BH procedure used in most
   experiments; Section~\ref{sec:scope} states which guarantee applies to which
   procedure and Section~\ref{sec:variantT} reports the experiments run under~(T).
 \item \textbf{Resolution analysis.}  Because a two-sample test with $m$
@@ -205,7 +211,7 @@ not the idea of MMD-based predictive-state clustering.  Concretely:
   $R_{\rm crit}$ estimation on Dec-Tiger and a 4-state chain Dec-POMDP.  All
   numbers are computed from result files released with the code
   (\url{https://github.com/npow/quotient-learning-papers}, directory
-  \texttt{cql/}, artifacts at tag \texttt{v1}; file list in
+  \texttt{cql/}, artifacts at tag \texttt{v1} = commit \texttt{83f9f42}, new files in commit \texttt{2c16829}; file list in
   Appendix~\ref{sec:artifacts}); every seed is reported.
 \end{enumerate}
 
@@ -247,7 +253,9 @@ distributions, and kernel embeddings of predictive state representations
 \emph{Relation to our work.}  Our estimator is in the same family (kernel
 comparison of conditional futures), so the \emph{idea} is not new.  The
 differences are: (i) we discretise the pasts into quantile bins and run a
-\emph{two-sample test} per pair of bins with explicit error control, whereas the
+\emph{two-sample test} per pair of bins with a stated level (as noted above,
+test-based merging of predictive states is not new: Mixed LICORS permits
+nonparametric two-sample equality tests), whereas the
 RKHS $\varepsilon$-machine smooths over individual pasts with a regularised
 conditional embedding and clusters with a user-set scale; (ii) we state the
 estimand for finite samples (the bin-level quotient $\Qstar_B$, Definition~4)
@@ -267,7 +275,9 @@ partition of histories with identical conditional futures) with a recurrent
 encoder trained to predict the next observation and reward, and discretise the
 hidden states, e.g.\ by $k$-means.  They prove connections to bisimulation
 metrics; the discretisation is not accompanied by a statistical test, so the
-number of classes is set by the discretiser.  We compare against a GRU
+number of classes is set by the discretiser (this concerns their recurrent-network
+pipeline only; test-based merging of predictive states exists in LICORS-type
+methods above).  We compare against a GRU
 encoder with the same training signal and $k$-means (silhouette) discretisation.
 This baseline conditions on the \emph{full} history, whereas our estimator
 uses one-step keys, so it is not handicapped by $\ell=1$.
@@ -420,14 +430,22 @@ removes each feature of (P) that the analysis does not cover:
   bandwidth (median heuristic) are fitted on a \emph{design} half of the
   trajectories; all tests use the other half.  (In (P) the bandwidth is chosen
   per pair from the tested sample and the edges from all data.)
-\item[(T2)] \emph{I.i.d.\ samples, no overlapping windows.}  Each test-half
-  trajectory contributes at most one window per bin (one uniformly chosen
-  visit), so the samples are i.i.d.\ across trajectories.  (In (P) up to $m_{\max}$
-  overlapping windows from the same trajectories are pooled.)  A stricter
-  option, \texttt{per\_traj}, uses a single uniformly chosen time per trajectory,
-  which makes the sampled law exactly the pooled bin law $P_b$ at the price of
-  about $B$ times fewer samples per bin; it is used for Dec-Tiger, whose state
-  is constant within an episode (Section~\ref{sec:variantT}).
+\item[(T2)] \emph{One window per trajectory, exact pooled law.}  Each
+  test-half trajectory contributes a \emph{single} window: a uniformly chosen
+  time $t^\star$, assigned to the bin of $z(o_{t^\star})$ (sampler
+  \texttt{per\_traj}).  For equal-length trajectories the window of a
+  trajectory that lands in bin $b$ has \emph{exactly} the pooled bin law $P_b$
+  of Section~\ref{sec:binning}, and windows are i.i.d.\ across trajectories, so
+  no mixing assumption is needed; the price is that a bin receives only about
+  $N_{\rm test}/B$ samples.  (In (P) up to $m_{\max}$ overlapping windows from
+  the same trajectories are pooled.)  The implementation also has a
+  \texttt{per\_bin} sampler (one uniformly chosen visit per trajectory and bin).
+  It gives more samples but targets the trajectory-weighted law
+  $\tilde P_b$ (the average, over trajectories that visit $b$, of the
+  within-trajectory bin laws), which equals $P_b$ only if visits are
+  exchangeable; it is \emph{not} covered by
+  Theorem~\ref{thm:main}, and we report its results only as labelled
+  ablations.
 \item[(T3)] \emph{Independent sides.}  For each pair $(b_1,b_2)$ the test-half
   trajectories are randomly split in two; side~1 uses $b_1$-windows of half~1 and
   side~2 uses $b_2$-windows of half~2.
@@ -480,36 +498,42 @@ Lemma~\ref{lem:tv} bounds the \emph{within-bin heterogeneity} of continuation
 laws (proof in the supplement).  Note that the relevant width is the bin's
 diameter in observation space, not $1/B$.
 
-\begin{theorem}[Recovery of the bin-level quotient]
+\begin{theorem}[Recovery of the bin-level quotient, variant~(T)]
 \label{thm:main}
-Let $\epsMMD=\min\{\mmd(P_b,P_{b'}):b,b'\in\calB,\ P_b\ne P_{b'}\}>0$.
-Suppose each active bin supplies $m$ continuation samples that are i.i.d.\ and
-independent across the two sides of every pair, and run variant~(T)
-(\textbf{not} procedure~(P)) with fixed bins and kernel and per-pair level
-$\alpha_0=\delta/\Khist^2$.  If
+Run variant~(T) (\textbf{not} procedure~(P)) on $N\ge20$ i.i.d.\ trajectories of
+common length $T$.  Edges and kernel are fitted on a design half of $\lfloor
+N/2\rfloor$ trajectories; condition on it, so the active bins $\calB$
+($\Khist=|\calB|$), their pooled laws $P_b$ and
+$\epsMMD=\min\{\mmd(P_b,P_{b'}):P_b\ne P_{b'}\}>0$ are fixed.  Let $\pi_b$ be the
+pooled mass of bin $b$ and $\pi_{\min}=\min_b\pi_b$, and let
+\[
+  m_\star=\frac{16\kappa^2}{\epsMMD^2}\Big(8+\log\frac{2\Khist^4}{\delta^2}\Big).
+\]
+Use \texttt{per\_traj} sampling on the other half, per-pair level
+$\alpha_0=\delta/\Khist^2$, and per-pair independent random halves of the test
+trajectories for the two sides.  If
 \begin{equation}
-  m\;\ge\;\frac{16\kappa^2}{\epsMMD^2}\Big(8+\log\frac{2\Khist^4}{\delta^2}\Big)
-  \;=\;O\!\Big(\frac{\log(\Khist/\delta)}{\epsMMD^2}\Big),
-  \label{eq:m-bound}
-\end{equation}
-then $\hat\calQ_B=\Qstar_B$ with probability at least $1-\delta$.
-If, in addition, the process is $\tau$-mixing so that from $N$ trajectories of
-length $T$ every active bin yields at least
-$m\ge N(T{-}\ell{-}k{+}1)/(c\,\Khist(\tau{+}k))$ effectively independent
-continuation samples ($c$ an absolute constant; quantile bins have equal mass),
-then it suffices that
-\begin{equation}
-  N \;=\; O\!\left(\frac{\Khist\,(\tau+k)\,\log(\Khist/\delta)}{T\,\epsMMD^2}\right).
+  N\;\ge\;\frac{10\,m_\star}{\pi_{\min}},
   \label{eq:bound}
 \end{equation}
+then $\hat\calQ_B=\Qstar_B$ with probability at least $1-2\delta$.  If the bins
+come from quantile edges, then $\pi_{\min}\ge1/(2B)$ with probability at least
+$1-\delta$ once $N\ge65B^2\log(2/\delta)$, so
+$N=O\!\big(B\log(B/\delta)/\epsMMD^2+B^2\log(1/\delta)\big)$ suffices for
+probability $\ge1-3\delta$ over the design and test halves together.
 \end{theorem}
 
 The proof (supplement, Section~A) combines the deviation bound for the biased
 MMD statistic \citep[Thm.~7]{Gretton2012}, the null threshold of
-\citet[Cor.~9]{Gretton2012}, and a union bound over the at most $\Khist^2/2$
-pairs; the constants are explicit.  With $\ell=1$ and $B=O(n)$ bins,
-$\Khist=B=O(n)$ and \eqref{eq:bound} reads
-$O(n(\tau{+}k)\log(n/\delta)/(T\epsMMD^2))$.
+\citet[Cor.~9]{Gretton2012}, a union bound over the at most $\Khist^2/2$
+pairs, and a Chernoff bound on the number of test trajectories whose single
+window lands in each bin; the constants are explicit.  The earlier version of
+this theorem assumed that $m$ i.i.d.\ samples per bin of the pooled law $P_b$ were
+available from overlapping windows under $\tau$-mixing; the \texttt{per\_bin}
+sampler that the earlier (T) experiments used does not sample $P_b$, and that
+thinning-based count is withdrawn.  The $B^2$ term is an artefact of the crude
+DKW argument for the quantile edges, and the sample budget now has no $T$
+or $\tau$ dependence: it uses one window per trajectory.
 
 \paragraph{Discussion.}
 Compared with the finite-alphabet bound
@@ -517,9 +541,11 @@ $O(|\calC|n^2k\tau\log(n/\delta)/(T\epsmin^2))$ of the companion paper, the
 $|\calC|$ factor is gone: the biased MMD deviates from its population value by
 $O(\kappa/\sqrt m)$ regardless of $d_c$ or of any alphabet
 \citep[Thm.~7]{Gretton2012}.  One factor of $n$ is also absent because quantile
-bins have equal mass by construction, so no term is needed to guarantee that
+bins have (nearly) equal mass by construction, so no term is needed to guarantee that
 every history is observed often enough.  The remaining dependence on $\Khist$
-is linear and comes from spreading the $NT$ samples over the bins.
+is linear: each trajectory supplies one window, so a bin receives about
+$N/(4B)$ samples per side.  This is the price of sampling the pooled law
+exactly; (P) uses many more (dependent) windows.
 
 \begin{remark}[Dimension enters through $\epsMMD$]
 \label{rem:dimension}
@@ -535,8 +561,8 @@ continuous quotient learning is easy in high dimension.
 Procedure~(P), which produced Tables~\ref{tab:layer1}--\ref{tab:mujoco}, is
 \emph{not} covered by Theorem~\ref{thm:main}.  It differs from (T) in four ways:
 permutation instead of analytic calibration, a data-selected per-pair
-bandwidth, BH across tests that share samples, and overlapping $\tau$-mixing
-windows.  We did not extend the theorem to (P).  What can and cannot be said:
+bandwidth, BH across tests that share samples, and many overlapping windows
+per trajectory instead of one.  We did not extend the theorem to (P).  What can and cannot be said:
 \begin{itemize}
 \item \emph{Permutation calibration and data-selected bandwidth (type-I side
   only).}  If the two samples of a pair are exchangeable under $H_0$ and the
@@ -818,62 +844,115 @@ apart): ARI measures bin quality and merging jointly.
 
 \subsection{Experiments under the analysed variant (T)}
 \label{sec:variantT}
-Theorem~\ref{thm:main} covers variant~(T) (Section~\ref{sec:method}), so we
-re-ran the ground-truth experiments with it: bins and bandwidth from a design
-half, one window per trajectory and bin from the other half, independent sides,
-analytic threshold with $\delta=0.05$ (5 seeds per cell, same data as
-Table~\ref{tab:ari}).
+Theorem~\ref{thm:main} covers variant~(T) with the \texttt{per\_traj} sampler
+(Section~\ref{sec:method}): bins and bandwidth from a design half, \emph{one
+window per test trajectory} (a uniformly chosen time, so the sampled law is
+exactly the pooled bin law $P_b$), independent sides, analytic threshold with
+$\delta=0.05$.  We re-ran the ground-truth experiments with it (5 seeds per
+cell, same data as Table~\ref{tab:ari}) and, as a labelled ablation, with the
+\texttt{per\_bin} sampler used in the previous version of this paper (one visit
+per trajectory and bin; \emph{not} covered by the theorem, since it samples the
+trajectory-weighted law $\tilde P_b$).
 
 \begin{table}[t]
 \centering
 \small
-\caption{Procedure~(P) versus variant~(T): range of $\hat n$ over 5 seeds and
-  mean ARI, at $B=n$ and at $B=8$.  Source: \texttt{partition\_accuracy.csv}.}
+\caption{Procedure~(P) versus variant~(T) at $B=n$: range of $\hat n$ over 5 seeds and
+  mean ARI.  (T-pt) is the analysed variant (\texttt{per\_traj}, covered by
+  Theorem~\ref{thm:main}); (T-pb) is the \texttt{per\_bin} ablation (not covered).
+  Sources: \texttt{partition\_accuracy.csv} (P, T-pb),
+  \texttt{partition\_accuracy\_pertraj.csv} (T-pt).}
 \label{tab:variantT}
-\begin{tabular}{lrcccccccc}
+\begin{tabular}{lrcccccc}
 \toprule
- & & \multicolumn{4}{c}{$B=n$} & \multicolumn{4}{c}{$B=8$} \\
-\cmidrule(lr){3-6}\cmidrule(lr){7-10}
- & & \multicolumn{2}{c}{(P)} & \multicolumn{2}{c}{(T)} & \multicolumn{2}{c}{(P)} & \multicolumn{2}{c}{(T)} \\
-Environment & $n$ & $\hat n$ & ARI & $\hat n$ & ARI & $\hat n$ & ARI & $\hat n$ & ARI \\
+Environment & $n$ & (P) $\hat n$ & (P) ARI & (T-pt) $\hat n$ & (T-pt) ARI & (T-pb) $\hat n$ & (T-pb) ARI \\
 \midrule
-Tiger & 2 & 2 & 0.91 & 1 & 0.00 & 2 & 0.91 & 1 & 0.00 \\
-K-cycle $K{=}2$ & 2 & 2 & 0.98 & 2 & 0.98 & 2 & 0.98 & 2 & 0.98 \\
-K-cycle $K{=}3$ & 3 & 3 & 0.82 & 3 & 0.82 & 5 & 0.62 & 5 & 0.62 \\
-K-cycle $K{=}4$ & 4 & 4 & 0.64 & 4 & 0.64 & 8 & 0.40 & 4--5 & 0.63 \\
-K-cycle $K{=}5$ & 5 & 5 & 0.50 & 5 & 0.50 & 8 & 0.38 & 7--8 & 0.40 \\
-K-cycle $K{=}8$ & 8 & 8 & 0.31 & 8 & 0.31 & 8 & 0.31 & 8 & 0.31 \\
-GaussMix $N_s{=}3$ & 3 & 3 & 0.98 & 3 & 0.98 & 5--6 & 0.63 & 1 & 0.00 \\
-GaussMix $N_s{=}4$ & 4 & 4 & 0.97 & 4 & 0.96 & 4--5 & 0.94 & 3--4 & 0.91 \\
-GaussMix $N_s{=}5$ & 5 & 5 & 0.97 & 5 & 0.95 & 7--8 & 0.56 & 1--2 & 0.27 \\
-GaussMix $N_s{=}6$ & 6 & 6 & 0.96 & 5--6 & 0.84 & 8 & 0.60 & 2--3 & 0.34 \\
+Tiger & 2 & 2 & 0.91 & 1 & 0.00 & 1 & 0.00 \\
+K-cycle $K{=}2$ & 2 & 2 & 0.98 & 2 & 0.98 & 2 & 0.98 \\
+K-cycle $K{=}3$ & 3 & 3 & 0.82 & 3 & 0.82 & 3 & 0.82 \\
+K-cycle $K{=}4$ & 4 & 4 & 0.64 & 3--4 & 0.61 & 4 & 0.64 \\
+K-cycle $K{=}5$ & 5 & 5 & 0.50 & 3 & 0.31 & 5 & 0.50 \\
+K-cycle $K{=}8$ & 8 & 8 & 0.31 & 1 & 0.00 & 8 & 0.31 \\
+GaussMix $N_s{=}3$ & 3 & 3 & 0.98 & 1 & 0.00 & 3 & 0.98 \\
+GaussMix $N_s{=}4$ & 4 & 4 & 0.97 & 1 & 0.00 & 4 & 0.96 \\
+GaussMix $N_s{=}5$ & 5 & 5 & 0.97 & 1 & 0.00 & 5 & 0.95 \\
+GaussMix $N_s{=}6$ & 6 & 6 & 0.96 & 1 & 0.00 & 5--6 & 0.84 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{Procedure~(P) versus variant~(T) at $B=8$: range of $\hat n$ over 5 seeds and
+  mean ARI.  (T-pt) is the analysed variant (\texttt{per\_traj}, covered by
+  Theorem~\ref{thm:main}); (T-pb) is the \texttt{per\_bin} ablation (not covered).
+  Sources: \texttt{partition\_accuracy.csv} (P, T-pb),
+  \texttt{partition\_accuracy\_pertraj.csv} (T-pt).}
+\label{tab:variantT8}
+\begin{tabular}{lrcccccc}
+\toprule
+Environment & $n$ & (P) $\hat n$ & (P) ARI & (T-pt) $\hat n$ & (T-pt) ARI & (T-pb) $\hat n$ & (T-pb) ARI \\
+\midrule
+Tiger & 2 & 2 & 0.91 & 1 & 0.00 & 1 & 0.00 \\
+K-cycle $K{=}2$ & 2 & 2 & 0.98 & 2 & 0.98 & 2 & 0.98 \\
+K-cycle $K{=}3$ & 3 & 5 & 0.62 & 1--2 & 0.06 & 5 & 0.62 \\
+K-cycle $K{=}4$ & 4 & 8 & 0.40 & 1--3 & 0.14 & 4--5 & 0.63 \\
+K-cycle $K{=}5$ & 5 & 8 & 0.38 & 1 & 0.00 & 7--8 & 0.40 \\
+K-cycle $K{=}8$ & 8 & 8 & 0.31 & 1 & 0.00 & 8 & 0.31 \\
+GaussMix $N_s{=}3$ & 3 & 5--6 & 0.63 & 1 & 0.00 & 1 & 0.00 \\
+GaussMix $N_s{=}4$ & 4 & 4--5 & 0.94 & 1 & 0.00 & 3--4 & 0.91 \\
+GaussMix $N_s{=}5$ & 5 & 7--8 & 0.56 & 1 & 0.00 & 1--2 & 0.27 \\
+GaussMix $N_s{=}6$ & 6 & 8 & 0.60 & 1 & 0.00 & 2--3 & 0.34 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{Findings.}
-(i) At the aligned resolution $B=n$, (T) returns the same $\hat n$ as (P) on
-K-cycle ($K\le8$) and GaussMix $N_s\le5$ (ARI within $0.02$), and loses a class
-on some GaussMix $N_s=6$ seeds ($\hat n=5$ on 3/5 seeds); on Tiger it returns
-$\hat n=1$ (see below).  (ii) At $B=8$ the two procedures err in opposite
-directions.  (T) over-splits less on K-cycle $K=4$ ($\hat n\in\{4,5\}$ versus $8$)
-and is equal to (P) at $K=3$ and $K=8$, but its analytic threshold is
-conservative and merges real classes: $\hat n=1$ on Tiger and GaussMix $N_s=3$
-and $1$--$4$ on the other GaussMix runs.  Tiger at $N=3000$ is not resolved by (T) at either $B$
-($\hat n=1$): with $m\approx700$ samples per side the threshold is
-$t_{\alpha_0}\approx0.2$--$0.3$, above the empirical MMD between the two Tiger
-continuation laws.  Scaling the sample size (\texttt{tiger\_T\_scaling.csv}, 5 seeds, $B\in\{2,8\}$): $\hat n=1$ at $N=3000$
-(median threshold $0.21$ at $B=2$ and $0.26$ at $B=8$, above the largest observed
-statistic, $0.17$ and $0.23$), and $\hat n=2$ with ARI $0.91$ on all 5 seeds at
-both $B$ for $N=10^4$ (thresholds $0.11$--$0.14$) and $N=3\cdot10^4$ ($0.065$--$0.082$).
-So (T) does resolve Tiger, with about $3$--$10\times$ the trajectories (P) needs.
-(iii) Permutation calibration and BH on (T)'s data pipeline
-(P$^{\rm fix}$: fixed bins and kernel, i.i.d.\ single windows, independent sides)
-reproduces (P)'s output on Tiger, K-cycle $K\in\{2,4\}$ and GaussMix $N_s=4$
-(same $\hat n$ on 37 of 40 comparable (seed, $B$-rule) pairs; the 3 differences are all GaussMix $N_s=4$ at $B=8$, $\hat n\in\{4,5\}$),
-so the over-splitting of (P) at $B=8$ is attributable to calibration (permutation
-$p$-values at a floor of $1/(R{+}1)$ with BH), not to the overlapping windows or the
-per-pair bandwidth, at least in these environments.  (iv) Dec-Tiger:
+(i) With the sampler that Theorem~\ref{thm:main} covers, (T-pt) is far more
+conservative than (P) at the experiments' sample sizes ($N=2000$--$3000$): at
+$B=n$ it matches (P) on K-cycle $K=2,3$ only, loses classes on $K=4,5$, and
+returns $\hat n=1$ (everything merged) on Tiger, K-cycle $K=8$ and all
+GaussMix runs.  The reason is the budget: one window per trajectory leaves
+$m\approx N/(4B)$ samples per side (median $m$: $361$ on Tiger, $121$--$161$ on
+GaussMix $N_s=3,4$, $89$ on K-cycle $K=8$), and condition~\eqref{eq:bound}
+requires $N\ge10m_\star/\pi_{\min}$, which is orders of magnitude larger (for
+$\kappa=1$, $B=8$, $\delta=0.05$ and $\epsMMD=0.3$,
+$m_\star\approx4.1\cdot10^3$ and $N\gtrsim6.5\cdot10^5$).  So the earlier
+statement that (T) matches (P) at $B=n$ on K-cycle and GaussMix does \emph{not}
+survive: it held for the \texttt{per\_bin} sampler (T-pb), which is not covered by
+the theorem.  (ii) Scaling the sample size
+(\texttt{T\_traj\_scaling.csv}, \texttt{per\_traj}, 5 seeds, $B=n$): (T-pt)
+returns $\hat n=n$ on all 5 seeds at $N=10^4$ for GaussMix $N_s=3,4,6$
+(ARI $0.97$--$0.99$) and K-cycle $K=3,4$ (ARI equal to the $B=n$ ARI of (P)), and
+at $N=3\cdot10^4$ for K-cycle $K=8$ (ARI $0.31$, as (P)).  At $B=2n$ it
+over-splits as $N$ grows when bins are not aligned (K-cycle $K=3$: $\hat n=5$
+at $N=10^5$; $K=4$: $4$--$6$ at $3\cdot10^4$ and $8$ at $10^5$), but at $B=2n$ it
+merges everything until $N=3\cdot10^4$ on GaussMix $N_s=4,6$ (at $10^4$) and until
+$N=10^5$ on K-cycle $K=8$ ($\hat n=1$ at $3\cdot10^4$).  Tiger
+(\texttt{tiger\_T\_scaling\_pertraj.csv}, $N\in\{3\cdot10^3,10^4,3\cdot10^4,10^5\}$): $\hat n=1$ on all
+5 seeds at $N=3000$ for both $B$ (median threshold $0.30$ at $B=2$ and $0.72$ at
+$B=8$, above the largest observed statistic, $0.25$ and $0.35$); $\hat n=2$ with ARI
+$0.91$ on all seeds at $B=2$ from $N=10^4$, and at $B=8$ only at $N=10^5$ (it
+still merges at $3\cdot10^4$).  So (T-pt) resolves Tiger with about $3$--$30\times$
+the trajectories that (P) needs.  (iii) Permutation calibration and BH on (T)'s
+\texttt{per\_traj} pipeline (P$^{\rm fix}$: fixed bins and kernel, one window per
+trajectory, independent sides; \texttt{partition\_accuracy\_pertraj.csv}) matches
+(P) at $B=n$ on Tiger, K-cycle $K\in\{2,4\}$ and GaussMix $N_s=4$.
+At $B=8$ it keeps (P)'s over-splitting on K-cycle $K=4$
+($\hat n\in\{6,\dots,8\}$, ARI $0.42$ versus $0.40$) and GaussMix $N_s=4$
+($4$--$5$, as (P)), but it merges Tiger ($\hat n=1$ at $B=8$ where (P) returns $2$), since
+it has only $m\approx88$ samples per side.  At $B=2n$ on K-cycle
+(\texttt{partition\_accuracy\_2n.csv}) P$^{\rm fix}$ over-splits for $K=4,5$
+($\hat n\in[6,8]$ and $[8,10]$, as (P): $8$ and $10$) but not for $K=8$
+($3$--$6$ versus $16$ for (P)).  So the over-splitting of (P) is attributable to
+permutation/BH calibration, rather than to overlapping windows or the per-pair
+bandwidth, \emph{only} in the cases tested: Tiger, K-cycle $K\in\{2,4\}$ and GaussMix
+$N_s=4$ at $B=n$; K-cycle $K=4$ and GaussMix $N_s=4$ at $B=8$; K-cycle $K\in\{4,5\}$
+at $B=2n$ (5 seeds each).  It is \emph{not} reproduced for Tiger at $B=8$
+(P$^{\rm fix}$ merges, $\hat n=1$) or K-cycle $K=8$ at $B=2n$, and the other
+environments were not run with P$^{\rm fix}$; we make no attribution there.
+(iv) Dec-Tiger:
 we use \texttt{per\_traj} sampling (one random time per trajectory, so the
 sampled law is exactly the pooled bin law; the state is constant within an
 episode, and the \texttt{per\_bin} scheme would re-weight the bins' laws
@@ -886,17 +965,21 @@ $(0.1,1.0)$: $\hat n_A=2$ on all seeds, but agent~B ($\sigma_B=1$) collapses to 
 class at $N=1000$ ($\hat R_{\rm crit}=0.999$ versus $0.631$) and returns $3$--$4$ classes at
 $N=20000$ ($0.563$, mean absolute error $0.068$).  Permutation+BH on the same
 data pipeline (P$^{\rm fix}$) over-splits agent~A on 2/10 (symmetric) and 3/10
-(asymmetric) seeds at $N=1000$ and returns $\hat n_A=\hat n_B=4$ on all 3 seeds run at
-$N=20000$ (symmetric: $\hat R_{\rm crit}=1.24$ against $0.262$; only 3 seeds because each
-takes about two minutes).  The over-splitting of $R_{\rm crit}$ under (P) is thus again a
-property of the permutation/BH calibration: consistent with its resolving
+(asymmetric) seeds at $N=1000$, and at $N=20000$ on \emph{all 10 of 10 seeds in
+both configurations} (seeds $0$--$2$ in \texttt{dec\_tiger\_variant\_t.csv}, seeds
+$3$--$9$ in \texttt{dec\_tiger\_pfix\_N20000\_seeds3\_9.csv}): symmetric
+$\hat n_A=\hat n_B=4$ on 9/10 seeds and $3$ on 1/10 ($\hat R_{\rm crit}\approx1.24$ against
+$0.262$ on seeds $0$--$2$); asymmetric $\hat n_A=3$, $\hat n_B=4$ on all 10 seeds.
+The over-splitting of $R_{\rm crit}$ under (P) is thus a
+property of the permutation/BH calibration on this environment, consistent with its resolving
 within-class bin differences ever more finely as $N$ grows (the bin-level quotient
 $\Qstar_B$ is generically finer than the latent one), while (T) stays at the
 latent index but is conservative.
 \textbf{Reading.}  The Section~5 results for (P) are therefore not guarantees: the
-guaranteed procedure is far more conservative and needs roughly $10\times$ more
-trajectories on Tiger to resolve the same two classes.  We report both because
-(P) is the procedure that is practical at $N\le3000$.
+guaranteed procedure is far more conservative and needs between roughly $3\times$ and
+$30\times$ more trajectories than (P) on the environments tested
+(Tiger: $N\ge10^4$ at $B=2$ and $10^5$ at $B=8$, against $3000$ for (P)).  We report
+both because (P) is the procedure that is practical at $N\le3000$.
 %%END-REVISION-SECTIONS
 
 %%BEGIN-BASELINES
@@ -964,8 +1047,8 @@ $K=8$) and it fails on the GaussMix random walk with $N_s=5$ ($0.35$, $\hat n=2$
 ours where classes are well separated (Tiger $0.91$, K2 $0.97$, G3 $0.99$, G5
 $0.99$ with the correct count) and weaker on K4/K8; with DBSCAN at our scaling
 of its threshold it returns one cluster on Tiger, K4, K8 --- the threshold is
-exactly the kind of unvalidated scale parameter that the test-based formulation
-avoids, but we also did not tune it.  (iii) A Ferns metric on the bins and
+exactly the kind of unvalidated scale parameter that a calibrated test avoids,
+but we also did not tune it.  (iii) A Ferns metric on the bins and
 silhouette-clustered $W_1$ at $B=8$ do better than our estimator at the same
 $B=8$ on K4 ($0.64$ and $0.61$ versus $0.40$) and tie on Tiger, but fail at K8
 ($0.12$, $0.20$ versus $0.31$).  (iv) No single $W_1$ threshold works: $\varepsilon=0.5$ is right
@@ -977,8 +1060,9 @@ on both'' environments is withdrawn: with a validated count and $B$ chosen
 without $n$, our estimator is correct on Tiger, K2, K3 and GaussMix, and other
 methods match or beat it on specific environments.  What distinguishes the
 estimator is not accuracy but form: it outputs a partition together with a
-test-based decision for each merge, a stated target ($\Qstar_B$), and (for
-variant~(T)) a sample bound, none of which the compared methods provide.
+calibrated test decision for each merge, a stated target ($\Qstar_B$), and (for
+variant~(T)) a sample bound; of the compared methods, none states a target or sample
+bound, and test-based merging is not unique to us (Mixed LICORS permits it).
 
 \begin{table}[t]
 \centering
@@ -1218,8 +1302,8 @@ is monotone non-decreasing in $\sigma_B$ on both environments.
 We studied Myhill--Nerode quotient learning for continuous observation--action
 spaces with a kernel-MMD two-sample test on quantile-binned histories.  The idea
 of clustering predictive distributions with MMD is not new
-\citep{Brodu2022}; our contribution is the test-based formulation with an
-explicit finite-sample target (the bin-level quotient at the test's resolution),
+\citep{Brodu2022}; our contribution is a finite-sample formulation with an
+explicit target (the bin-level quotient at the test's resolution),
 an alphabet-free bound for an \emph{analysed variant}, and an empirical
 characterisation of when the implemented procedure does and does not recover
 the latent partition.  Directions: bin-count selection with statistical

@@ -159,32 +159,59 @@ guarantees $m\varepsilon^2$ exceeds this bound.
 Let $\calP$ be the set of tested pairs, $|\calP|\le\Khist^2/2$.  Run the
 decision of Lemma~\ref{lem:pair} on every pair with
 $\alpha_0=\delta'=\delta/\Khist^2$.  With $\varepsilon=\epsMMD$,
-\eqref{eq:m-pair} becomes condition~(2) of the main paper,
-$m\ge(16\kappa^2/\epsMMD^2)(8+\log(2\Khist^4/\delta^2))$.  By a union bound
+\eqref{eq:m-pair} becomes $m\ge m_\star$, where
+$m_\star=(16\kappa^2/\epsMMD^2)(8+\log(2\Khist^4/\delta^2))$, provided every
+active bin supplies at least $m_\star$ i.i.d.\ samples per side from~$P_b$;
+the next paragraph shows when the \texttt{per\_traj} sampler does.  By a union bound
 the probability that \emph{some} pair is decided wrongly is at most
 $|\calP|(\alpha_0+\delta')\le(\Khist^2/2)(2\delta/\Khist^2)=\delta$.  On the
 complementary event every same-class pair (in $\Qstar_B$) is merged and no
 cross-class pair is merged, so the connected components of the union--find
 graph are exactly the classes of $\Qstar_B$, i.e.\ $\hat\calQ_B=\Qstar_B$.
 
-For the trajectory budget, each trajectory contributes $T'=T-\ell-k+1$
-$(\text{history},\text{continuation})$ pairs; for $\ell=1$ quantile keys have
-equal mass, so each of the $\Khist$ keys receives $NT'/\Khist$ of them (for
-$\ell>1$ replace $1/\Khist$ by the smallest key mass).  Under the
-$\tau$-mixing assumption of the theorem, thinning the within-trajectory
-sequence to windows separated by $\tau+k$ steps leaves
-$m\ge NT'/(c\Khist(\tau+k))$ effectively independent samples per key
-(consecutive continuation windows overlap over $k$ steps and are decorrelated
-after a further $\tau$ steps).  Requiring this to exceed the per-pair bound
-gives
-\[
-  N\;\ge\;\frac{16c\,\kappa^2\,\Khist(\tau+k)}{T'\,\epsMMD^2}
-          \Big(8+\log\frac{2\Khist^4}{\delta^2}\Big)
-   \;=\;O\!\Big(\frac{\Khist(\tau+k)\log(\Khist/\delta)}{T\,\epsMMD^2}\Big)
-\]
-for $T\gg\ell+k$.  If the implementation caps each side at $m_{\max}$
-samples, the theorem applies with $m=\min(m,m_{\max})$, i.e.\ it requires
-$m_{\max}$ to exceed the right-hand side of \eqref{eq:m-pair}.
+\emph{Trajectory budget (variant (T), \texttt{per\_traj}).}  Condition on the
+design half, which fixes the edges, the bandwidth, the active bins $\calB$,
+their pooled laws $P_b$ and masses $\pi_b$ (the pooled mass of $\{z\in b\}$ over
+$(\text{trajectory},\text{time})$; for equal-length trajectories this is the
+probability that a uniformly chosen time falls in $b$).  The test half
+contains $N_{\rm t}=N-\lfloor N/2\rfloor\ge N/2$ trajectories; for a pair, a
+fresh uniformly random half of size $N_s=\lfloor N_{\rm t}/2\rfloor\ge N/4-1\ge
+N/5$ ($N\ge20$) supplies each side.  Each trajectory independently draws one
+uniform time $t^\star$ and contributes the window starting at $t^\star$ to the
+bin of $z(o_{t^\star})$.  Hence the number of side-$j$ samples in bin $b$ is
+$\mathrm{Bin}(N_s,\pi_b)$, and, \emph{given the counts}, those samples are
+i.i.d.\ draws from $P_b$ (the conditional law of the window given that the
+chosen time lies in $b$, which is the pooled bin law of Definition~4), and are
+independent across sides (disjoint trajectories) and of the design half.  No
+mixing assumption is used.  The chain of reasoning in the first paragraph
+applies with $m=\min(\text{counts})$ on the event
+$\mathcal E=\{\text{all counts}\ge m_\star\}$, where $m_\star$ is the right-hand
+side of \eqref{eq:m-pair} with $\varepsilon=\epsMMD$ (the code subsamples both
+sides to the common size $m$ uniformly without replacement, which preserves the
+i.i.d.\ property).  By the multiplicative Chernoff bound
+$\Pr[\mathrm{Bin}(n,\pi)\le n\pi/2]\le e^{-n\pi/8}$.  If $N\ge10m_\star/\pi_{\min}$ then
+$N_s\pi_b/2\ge N\pi_{\min}/10\ge m_\star$, so each count exceeds $m_\star$ except with
+probability $\le e^{-N_s\pi_{\min}/8}\le e^{-N\pi_{\min}/40}$.  Since
+$\epsMMD\le2\kappa$, $m_\star\ge4(8+\log(2\Khist^4/\delta^2))$, so
+$N\pi_{\min}/40\ge m_\star/4\ge8+\log(2\Khist^4/\delta^2)$ and
+$e^{-N\pi_{\min}/40}\le e^{-8}\delta^2/(2\Khist^4)$.  A union bound over at most
+$\Khist^2/2$ pairs and 2 sides gives $\Pr[\mathcal E^c]\le\Khist^2
+e^{-N\pi_{\min}/40}\le e^{-8}\delta^2/(2\Khist^2)\le\delta$.  Together with the
+pair-decision failure probability $\le\delta$ (which holds conditionally on the
+counts on $\mathcal E$), $\Pr[\hat\calQ_B\ne\Qstar_B]\le2\delta$.
+
+\emph{Quantile edges.}  For $\ell=1$ the design half fits $\hat e_j=F_{N_d}^{-1}(j/B)$ with $N_d=\lfloor
+N/2\rfloor$.  By the DKW argument of Section~B (applied to the i.i.d.\ blocks
+$G_i$) $\sup_x|F_{N_d}-F|\le t:=\sqrt{\log(2/\delta)/(2N_d)}$ with probability
+$\ge1-\delta$, and $F$ atomless gives $|F_{N_d}(\hat e_j)-j/B|\le1/(N_dT)$, so
+$\pi_b\ge1/B-2t-2/(N_dT)$.  If $N_d\ge32B^2\log(2/\delta)$, then $t\le1/(8B)$ and
+$2/(N_dT)\le1/(4B)$, hence $\pi_{\min}\ge1/(2B)$, which holds when $N\ge65B^2\log(2/\delta)$.
+Substituting $\pi_{\min}\ge1/(2B)$ in \eqref{eq:bound} and $\Khist\le B$ gives
+$N=O(B\log(B/\delta)/\epsMMD^2+B^2\log(1/\delta))$ with total failure probability $\le3\delta$.
+The $B^2$ term comes from this crude edge-stability argument and is not claimed to be tight.
+If the implementation caps each side at $m_{\max}$ samples (the \texttt{per\_traj}
+variant used in the experiments does not), the theorem applies with
+$m=\min(m,m_{\max})$, i.e.\ it requires $m_{\max}\ge m_\star$.
 \end{proof}
 
 \begin{remark}[Why the constants matter]
@@ -456,8 +483,10 @@ action-space generator, so individual draws differ from the earlier result
 files).  Seeds $0$--$4$.  Procedure~(P): the package estimator unchanged.
 Variant~(T) and (P$^{\rm fix}$): \texttt{continuous\_quotient/variant\_t.py},
 $\delta=0.05$ for (T), $\alpha$ and $R$ as for (P) for (P$^{\rm fix}$), design
-fraction $0.5$, minimum $20$ samples per side, \texttt{per\_bin} sampling
-except Dec-Tiger (\texttt{per\_traj}).  ARI is computed over all steps with a
+fraction $0.5$, minimum $20$ samples per side.  Sampler: the (T-pt) and P$^{\rm fix}$-pt rows
+use \texttt{per\_traj} (the sampler Theorem~1 covers); the (T-pb) rows and the
+old P$^{\rm fix}$ comparison in \path{partition_accuracy.csv} use
+\texttt{per\_bin} (not covered); Dec-Tiger uses \texttt{per\_traj}.  ARI is computed over all steps with a
 full 2-step continuation whose bin is active.  Result files:
 \path{partition_accuracy.csv} (merged from \path{partition_accuracy_part1.csv},
 \path{_part2.csv}, \path{_part3.csv} by \path{summarize.py}),
@@ -667,7 +696,14 @@ Velocity $\ell_2$ (oracle) & 0.082 & 1.492 \\
 
 Code, scripts and result files are in the public repository
 \url{https://github.com/npow/quotient-learning-papers}, directory \texttt{cql/};
-the artifacts cited here are at tag \texttt{v1}.  All paths below are relative to
+the artifacts cited here are at tag \texttt{v1}, which points to commit
+\texttt{83f9f42d8533c62fd05fcef2192559e0f80be3d9} (tags can be retargeted; the
+hash is the immutable reference).  Result files and scripts added in this
+revision (marked ``this version'' below: \path{partition_accuracy_pertraj.csv},
+\path{partition_accuracy_2n.csv}, \path{T_traj_scaling.csv},
+\path{tiger_T_scaling_pertraj.csv}, \path{dec_tiger_pfix_N20000_seeds3_9.csv}
+and their scripts) are not in \texttt{v1}; they are in commit
+\texttt{2c168297b5cd6fcc35e9a0a6a901411d2d1fb404} of the same repository.  All paths below are relative to
 \texttt{cql/}.
 
 \paragraph{Result files (every number in the paper comes from one of these).}
@@ -691,15 +727,30 @@ the artifacts cited here are at tag \texttt{v1}.  All paths below are relative t
   \path{bisim_comparison.csv} and \path{dbc_comparison.csv} are the
   first-coordinate Wasserstein and the custom DBC objective of the previous
   version and are \emph{superseded} (not used in any table of this version).
+\item Table-to-file map: main-paper Table~\ref{tab:variantT} $\leftarrow$
+  \path{partition_accuracy.csv} (P, T-pb) and \path{partition_accuracy_pertraj.csv}
+  (T-pt); Tiger scaling in the text $\leftarrow$ \path{tiger_T_scaling_pertraj.csv};
+  K-cycle/GaussMix scaling $\leftarrow$ \path{T_traj_scaling.csv}; Dec-Tiger
+  (iv) $\leftarrow$ \path{dec_tiger_variant_t.csv} and
+  \path{dec_tiger_pfix_N20000_seeds3_9.csv}; Tables~\ref{tab:layer1}--\ref{tab:mujoco}
+  $\leftarrow$ the Layer 1--3 files above.
 \item Revision (\path{experiments/revision/results/}):
-  \path{partition_accuracy.csv} (procedures P, P$^{\rm fix}$, T; ARI),
+  \path{partition_accuracy.csv} (procedures P, and T and P$^{\rm fix}$ with
+  \texttt{per\_bin}; ARI), \path{partition_accuracy_pertraj.csv} (T and
+  P$^{\rm fix}$ with \texttt{per\_traj}), \path{partition_accuracy_2n.csv}
+  ($B=2n$ on K-cycle $K\in\{4,5,8\}$: P, P$^{\rm fix}$-pt, T-pt),
+  \path{T_traj_scaling.csv} (T-pt as $N$ grows), \path{tiger_T_scaling.csv}
+  (\texttt{per\_bin}) and \path{tiger_T_scaling_pertraj.csv},
+  \path{dec_tiger_pfix_N20000_seeds3_9.csv} (7 additional P$^{\rm fix}$ seeds),
   \path{partition_baselines.csv} (W1, Ferns metric, DBC, causal-state, RKHS
   $\varepsilon$-machine; ARI), \path{dec_tiger_variant_t.csv},
   \path{gaussmix_alpha_check.csv}.
 \end{itemize}
 Scripts: \path{experiments/revision/run_partition_accuracy.py},
 \path{run_partition_baselines.py}, \path{baselines_lib.py},
-\path{run_dec_tiger_variant_t.py}, \path{check_gaussmix_alpha.py},
+\path{run_dec_tiger_variant_t.py}, \path{run_dec_tiger_pfix_extra.py},
+\path{run_T_traj_scaling.py}, \path{run_tiger_T_scaling.py},
+\path{check_gaussmix_alpha.py},
 \path{experiments/layer2_mujoco/halfcheetah_groupsplit_value.py}; package code
 \path{continuous_quotient/variant_t.py}; tests under \path{tests/}.
 
@@ -717,7 +768,15 @@ Scripts: \path{experiments/revision/run_partition_accuracy.py},
   on all 12 runs at $\alpha=0.05$ and at $\alpha=0.01$, so the result file cannot
   discriminate between the two settings and the reported numbers are unaffected.
   The paper now states $\alpha=0.05$, $R=99$ throughout.
-\item \emph{Missing result-file names} in Appendices~C--D are filled in above.
+\item \emph{Missing result-file names} in Appendices~C--D are filled in above;
+  in the rendered web version of the previous submission every \path{} was
+  dropped by our converter, which left the file lists blank.
+\item \emph{Variant (T) sampler (this version).}  The previous (T) experiments used
+  the \texttt{per\_bin} sampler, which does not sample the pooled bin law $P_b$ of
+  Definition~4, so they did not test Theorem~1.  Theorem~1 and its trajectory
+  budget were restated for \texttt{per\_traj} (Section~A) and Table~\ref{tab:variantT}
+  now reports it alongside the old sampler.  The \texttt{per\_traj} runs are
+  much more conservative at $N\le3000$.
 \item \emph{Pow 2026 / companion paper} is unpublished; nothing in this paper's
   claims relies on it beyond the definition of the finite-alphabet baseline,
   and its G-test rows in Table~\ref{tab:ablation} come from

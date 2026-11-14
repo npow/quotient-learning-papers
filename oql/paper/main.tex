@@ -740,8 +740,9 @@ result inside it.
 All code, results, and the paper source are in the public repository
 \url{https://github.com/npow/quotient-learning-papers}, directory
 \texttt{oql/}; every path below is relative to that directory, and the
-version cited here is the release tagged \texttt{v1} (we give the tag rather
-than a hash; the \texttt{commit} field inside each JSON sidecar records the
+version cited here is the release tagged \texttt{v1}, which points to
+commit \texttt{83f9f42d8533c62fd05fcef2192559e0f80be3d9} of the public
+repository (tags can be retargeted, so the hash is the immutable reference; the \texttt{commit} field inside each JSON sidecar records the
 hash of the development repository at generation time and need not resolve in
 the public one).  The exact commands, CSV rows, JSON sidecars, seeds, and
 package versions are under \texttt{experiments/main\_table/results\_independent\_smoke},
@@ -1078,21 +1079,29 @@ given ``routed to $h$ and reaching $r+k$'', call it $Q_h$, need not equal
 $P_h$.  What is guaranteed is the exact decomposition below.
 
 \begin{proposition}[Routed laws]\label{prop:routing}
-Write $\lambda_g=\Prb(\text{routed to }g,\ Z\text{ reaches }r+k)$.  If
-$\lambda_h>0$ then
+Write $\lambda_g=\Prb(\text{routed to }g,\ Z\text{ reaches }r+k)$.
+Convention: $Q_g$ is defined only when $\lambda_g>0$, and terms with
+$\lambda_g=0$ are omitted from every sum and mixture below.  Then, whenever
+$\lambda_h+\sum_{g\in G_h}\lambda_g>0$,
 \[
   P_h\;=\;\frac{\lambda_h Q_h+\sum_{g\in G_h}\lambda_g Q_g}
                 {\lambda_h+\sum_{g\in G_h}\lambda_g},
 \]
-and $Q_g=P_g$ for every $g\in\cH$ that has no proper extension in $\cH$.
+and $Q_g=P_g$ for every $g\in\cH$ with $\lambda_g>0$ that has no proper
+extension in $\cH$.
 Consequently:
 \begin{enumerate}
 \item If $\cH$ is the full eligible universe (the event of
 Corollary~\ref{cor:sample}), every history routes to a context of the
-maximal eligible length $\min(L,r+1)$, and for each class $c$ the
-continuation law of the histories routed to $c$, given reaching $r+k$, is
-exactly the common law $P_c$ of its members.  The routed class law is the
-quotient's class law, and the induced state map is total.
+maximal eligible length $\min(L,r+1)$.  Hence a class all of whose members
+are non-maximal contexts has $\lambda_c=0$: it receives no routed histories
+and has no routed law (for example the singleton class $\{(0)\}$ in the nested
+$L=2$ example of Appendix~\ref{app:envs}).  For every class $c$ with positive
+routed mass $\lambda_c=\sum_{m\in c}\lambda_m>0$, the continuation law of the
+histories routed to $c$, given reaching $r+k$, is the mixture of $Q_m=P_m$
+over the members $m$ with $\lambda_m>0$, and equals the common law $P_c$ of
+its members.  The induced state map is total, but only classes with positive
+routed mass are ever the image of a history.
 \item If $\cH$ is a strict subset, then for a class $c$ containing a
 non-maximal member $h$ whose extensions in $\cH$ include contexts $g$ with
 $P_g\ne P_h$, $Q_h$ is the residual law determined by the display, and it
@@ -1106,12 +1115,14 @@ residual laws $Q_h$.
 \begin{proof}
 Every history in $E_h$ either routes to $h$ or matches some $g\in G_h$ and then
 routes to a longest match $g'$, which is longer than $g$ and so also has $h$
-as a suffix, i.e.\ $g'\in G_h$.  Thus $E_h=R_h\sqcup\bigsqcup_{g\in G_h}R_g$,
+as a suffix, i.e.\ $g'\in G_h$ (histories routed to a context with
+$\lambda=0$ carry no mass and are omitted by the convention).  Thus $E_h=R_h\sqcup\bigsqcup_{g\in G_h}R_g$,
 and the display is the law of total probability for
 $P_h=\Prb(C=\cdot\mid E_h,\text{reach})$.  A context with no extension in
-$\cH$ has $R_g=E_g$, so $Q_g=P_g$.  In case~1 all routing is to maximal
-contexts, each member $m$ of $c$ satisfies $Q_m=P_m=P_c$, and a mixture of
-equal laws is that law.  For the last statement of case~2, if all
+$\cH$ has $R_g=E_g$, so $Q_g=P_g$ when $\lambda_g>0$.  In case~1 all routing
+is to maximal contexts, so $\lambda_m=0$ for non-maximal $m$; each member $m$
+of $c$ with $\lambda_m>0$ satisfies $Q_m=P_m=P_c$, and if $\lambda_c>0$ the
+routed law is a mixture of equal laws, which is that law.  For the last statement of case~2, if all
 $Q_g$ ($g\in G_h$) equal $P_h$, the display forces $Q_h=P_h$ when
 $\lambda_h>0$.
 \end{proof}
@@ -1145,7 +1156,7 @@ a minute for each 80-run abstention sweep, and a few minutes for the
 remaining Section~\ref{sec:checks} checks combined (the nested $L=2$ run,
 at $140{,}000$ episodes $\times$ 20 seeds, dominates); no GPU was used.
 Artifact locations: repository \url{https://github.com/npow/quotient-learning-papers},
-directory \texttt{oql/}, release tag \texttt{v1}; result directories, the
+directory \texttt{oql/}, release tag \texttt{v1} (commit \texttt{83f9f42d8533c62fd05fcef2192559e0f80be3d9}); result directories, the
 per-seed partition CSV and the SHA-256 manifest
 (\texttt{experiments/ARTIFACTS\_MANIFEST.json}) are listed at the end of
 Section~\ref{sec:checks}, and the environment specifications are in
